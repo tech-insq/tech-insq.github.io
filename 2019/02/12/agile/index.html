@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="为什么要敏捷">
+<meta property="og:type" content="article">
+<meta property="og:title" content="敏捷研发流程实践">
+<meta property="og:url" content="https://tech-insq.github.io/2019/02/12/agile/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="为什么要敏捷">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/mjdsbj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/lc.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/guilv.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/haoc.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/mjwj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/mjrs.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/value.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/team.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/adap.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sjgl.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jtyy.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/xtgc.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/tdss.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/glzzb.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/tdcyzb.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/tdtzsybh.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/bclhrjjg.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdmjgl.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdmjkfcj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdddkf.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdmjhxjs.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdjszz.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdwztd.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdcpblog.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdddblog.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdwcbj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdddhyjh.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdmrzlhy.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdkshgl.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdddys.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdddhghy.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdyhgs.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/jdci.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/%E5%85%B3%E9%94%AE%E6%B4%BB%E5%8A%A8.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/V.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/scsbz.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sbzxmj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sbzbbj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sbzcpj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/bzbbq.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/bzjsrx.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/xgjsdyjs.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sscj1.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sscj2.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sscj3.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/sscmj.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2019/02/12/agile/xmjylsm.jpg">
+<meta property="article:published_time" content="2019-02-12T14:29:22.000Z">
+<meta property="article:modified_time" content="2021-11-30T13:48:43.639Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="软件">
+<meta property="article:tag" content="思想">
+<meta property="article:tag" content="原则">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2019/02/12/agile/mjdsbj.jpg">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/02/12/agile/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/02/12/agile/","path":"2019/02/12/agile/","title":"敏捷研发流程实践"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>敏捷研发流程实践 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%95%8F%E6%8D%B7"><span class="nav-number">1.</span> <span class="nav-text"> 为什么要敏捷</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E8%AF%9E%E7%94%9F%E7%9A%84%E5%8E%86%E5%8F%B2%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text"> 敏捷诞生的历史背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%9A%E7%95%8C%E6%95%8F%E6%8D%B7%E6%B5%AA%E6%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text"> 业界敏捷浪潮</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E6%9B%B4%E7%AC%A6%E5%90%88%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E8%A7%84%E5%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text"> 敏捷更符合软件开发规律</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E6%9E%9C"><span class="nav-number">1.4.</span> <span class="nav-text"> 效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E5%AE%A3%E8%A8%80"><span class="nav-number">1.5.</span> <span class="nav-text"> 敏捷软件开发宣言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E5%AE%A3%E8%A8%80%E9%81%B5%E5%BE%AA%E7%9A%84%E5%8E%9F%E5%88%99"><span class="nav-number">1.6.</span> <span class="nav-text"> 敏捷宣言遵循的原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E7%A1%AE%E7%90%86%E8%A7%A3%E6%95%8F%E6%8D%B7"><span class="nav-number">1.7.</span> <span class="nav-text"> 正确理解敏捷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E7%9A%84%E8%AF%AF%E8%A7%A3"><span class="nav-number">1.7.1.</span> <span class="nav-text"> 敏捷的误解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E7%BB%9F%E4%B8%80%E8%AE%A4%E8%AF%86"><span class="nav-number">1.7.2.</span> <span class="nav-text"> 敏捷统一认识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E7%90%86%E5%BF%B5%E8%A7%A3%E8%AF%BB"><span class="nav-number">1.7.3.</span> <span class="nav-text"> 敏捷理念解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E5%AE%9E%E8%B7%B5%E8%A7%A3%E8%AF%BB"><span class="nav-number">1.7.4.</span> <span class="nav-text"> 敏捷实践解读</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A0%94%E5%8F%91%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text"> 研发管理流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%A2%E9%98%9F%E8%A7%92%E8%89%B2"><span class="nav-number">2.1.</span> <span class="nav-text"> 团队角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E5%8F%91%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text"> 研发过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%94%E5%8F%91%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5"><span class="nav-number">2.2.1.</span> <span class="nav-text"> 研发流程阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%84%E5%AE%A1%E8%A6%81%E7%B4%A0"><span class="nav-number">2.2.2.</span> <span class="nav-text"> 评审要素：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%A8%A1%E5%9E%8B%E5%9C%A8%E7%89%88%E6%9C%AC%E7%A0%94%E5%8F%91%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">2.2.3.</span> <span class="nav-text"> 生命周期模型在版本研发项目中的应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A7%E5%93%81%E5%BC%80%E5%8F%91v-%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.4.</span> <span class="nav-text"> 产品开发V 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E8%B4%A3%E4%BB%BB%E4%BA%BA%E4%B8%BB%E9%A2%98"><span class="nav-number">2.2.5.</span> <span class="nav-text"> 阶段责任人主题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E5%AE%9E%E6%96%BD"><span class="nav-number">2.3.</span> <span class="nav-text"> 敏捷实施</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8E%E4%B8%BA%E6%95%8F%E6%8D%B7%E4%B8%89%E6%AD%A5%E8%B5%B0%E6%A1%88%E4%BE%8B"><span class="nav-number">2.3.1.</span> <span class="nav-text"> 华为敏捷三步走案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%B5%B0%E8%A7%A3%E8%AF%BB"><span class="nav-number">2.3.2.</span> <span class="nav-text"> 三走解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AB%E6%AD%A5%E6%9B%B2"><span class="nav-number">2.3.3.</span> <span class="nav-text"> 八步曲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%83%BD%E7%9A%84%E8%A7%92%E8%89%B2%E4%BA%BA%E9%80%89"><span class="nav-number">2.3.4.</span> <span class="nav-text"> 可能的角色人选</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%95%8F%E6%8D%B7%E7%9B%B8%E5%85%B3%E8%A7%92%E8%89%B2%E5%9C%A8%E5%8D%8E%E4%B8%BA%E5%AF%B9%E5%BA%94%E7%9A%84%E8%A7%92%E8%89%B2"><span class="nav-number">2.3.5.</span> <span class="nav-text"> 其他敏捷相关角色在华为对应的角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%BA%A7%E6%95%8F%E6%8D%B7%E5%AE%9E%E6%96%BD%E5%9C%BA%E6%99%AF"><span class="nav-number">2.3.6.</span> <span class="nav-text"> 项目级敏捷实施场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%BA%A7%E6%95%8F%E6%8D%B7%E8%BF%87%E7%A8%8B%E6%A0%B7%E4%BE%8B%E7%89%88%E6%9C%AC%E4%B8%AD%E9%A1%B9%E7%9B%AE%E5%85%A8%E9%83%BD%E5%AE%9E%E6%96%BD%E6%95%8F%E6%8D%B7"><span class="nav-number">2.3.7.</span> <span class="nav-text"> 项目级敏捷过程样例（版本中项目全都实施敏捷）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%BA%A7%E6%95%8F%E6%8D%B7%E8%BF%87%E7%A8%8B%E8%AF%B4%E6%98%8E"><span class="nav-number">2.3.8.</span> <span class="nav-text"> 项目级敏捷过程说明</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/02/12/agile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          敏捷研发流程实践
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-02-12 22:29:22" itemprop="dateCreated datePublished" datetime="2019-02-12T22:29:22+08:00">2019-02-12</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 21:48:43" itemprop="dateModified" datetime="2021-11-30T21:48:43+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%80%E6%9C%AF/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="为什么要敏捷"><a class="markdownIt-Anchor" href="#为什么要敏捷"></a> 为什么要敏捷</h1>
+<span id="more"></span>
+<h2 id="敏捷诞生的历史背景"><a class="markdownIt-Anchor" href="#敏捷诞生的历史背景"></a> 敏捷诞生的历史背景</h2>
+<p><img src="/2019/02/12/agile/mjdsbj.jpg" alt></p>
+<h2 id="业界敏捷浪潮"><a class="markdownIt-Anchor" href="#业界敏捷浪潮"></a> 业界敏捷浪潮</h2>
+<p><img src="/2019/02/12/agile/lc.jpg" alt></p>
+<h2 id="敏捷更符合软件开发规律"><a class="markdownIt-Anchor" href="#敏捷更符合软件开发规律"></a> 敏捷更符合软件开发规律</h2>
+<p><img src="/2019/02/12/agile/guilv.jpg" alt></p>
+<h2 id="效果"><a class="markdownIt-Anchor" href="#效果"></a> 效果</h2>
+<p><img src="/2019/02/12/agile/haoc.jpg" alt></p>
+<h2 id="敏捷软件开发宣言"><a class="markdownIt-Anchor" href="#敏捷软件开发宣言"></a> 敏捷软件开发宣言</h2>
+<blockquote>
+<p>我们一直在实践中探寻更好的软件开发方法，<br>
+身体力行的同时也帮助他人。由此我们建立了如下价值观：</p>
+<p>个体和互动 高于 流程和工具<br>
+工作的软件 高于 详尽的文档<br>
+客户合作 高于 合同谈判<br>
+响应变化 高于 遵循计划</p>
+<p>也就是说，尽管右项有其价值，<br>
+我们更重视左项的价值。</p>
+</blockquote>
+<h2 id="敏捷宣言遵循的原则"><a class="markdownIt-Anchor" href="#敏捷宣言遵循的原则"></a> 敏捷宣言遵循的原则</h2>
+<blockquote>
+<p><em>我们遵循以下原则：</em></p>
+<p>我们最重要的目标，是通过持续不断地<br>
+<strong>及早交付有价值</strong>的软件使客户满意。</p>
+<p>欣然<strong>面对需求变化</strong>，即使在开发后期也一样。<br>
+为了客户的竞争优势，敏捷过程掌控变化。</p>
+<p><strong>经常地交付可工作的软件</strong>，<br>
+相隔几星期或一两个月，倾向于采取<strong>较短</strong>的周期。</p>
+<p>业务人员和开发人员必须相互合作，<br>
+项目中的每一天都不例外。</p>
+<p>激发个体的斗志，以他们为核心搭建项目。<br>
+提供所需的环境和支援，辅以信任，从而达成目标。</p>
+<p>不论团队内外，传递信息效果最好效率也最高的方式是<br>
+面对面的交谈。</p>
+<p>可工作的软件是进度的首要度量标准。</p>
+<p>敏捷过程倡导可持续开发。<br>
+责任人、开发人员和用户要能够共同维持其步调稳定延续。</p>
+<p>坚持不懈地追求技术卓越和良好设计，敏捷能力由此增强。</p>
+<p>以简洁为本，它是极力减少不必要工作量的艺术。</p>
+<p>最好的架构、需求和设计出自自组织团队。</p>
+<p>团队定期地反思如何能提高成效，<br>
+并依此调整自身的举止表现。</p>
+</blockquote>
+<h2 id="正确理解敏捷"><a class="markdownIt-Anchor" href="#正确理解敏捷"></a> 正确理解敏捷</h2>
+<h3 id="敏捷的误解"><a class="markdownIt-Anchor" href="#敏捷的误解"></a> 敏捷的误解</h3>
+<p><img src="/2019/02/12/agile/mjwj.jpg" alt></p>
+<h3 id="敏捷统一认识"><a class="markdownIt-Anchor" href="#敏捷统一认识"></a> 敏捷统一认识</h3>
+<h4 id="统一认识"><a class="markdownIt-Anchor" href="#统一认识"></a> 统一认识</h4>
+<p><img src="/2019/02/12/agile/mjrs.jpg" alt></p>
+<h4 id="聚焦价值"><a class="markdownIt-Anchor" href="#聚焦价值"></a> 聚焦价值</h4>
+<p><img src="/2019/02/12/agile/value.jpg" alt></p>
+<h4 id="团队激发"><a class="markdownIt-Anchor" href="#团队激发"></a> 团队激发</h4>
+<p><img src="/2019/02/12/agile/team.jpg" alt></p>
+<h4 id="拥抱变化"><a class="markdownIt-Anchor" href="#拥抱变化"></a> 拥抱变化</h4>
+<p><img src="/2019/02/12/agile/adap.jpg" alt></p>
+<h4 id="优秀实践"><a class="markdownIt-Anchor" href="#优秀实践"></a> 优秀实践</h4>
+<p><img src="/2019/02/12/agile/sjgl.jpg" alt></p>
+<h4 id="具体应用"><a class="markdownIt-Anchor" href="#具体应用"></a> 具体应用</h4>
+<p><img src="/2019/02/12/agile/jtyy.jpg" alt></p>
+<h4 id="系统性工程"><a class="markdownIt-Anchor" href="#系统性工程"></a> 系统性工程</h4>
+<p><img src="/2019/02/12/agile/xtgc.jpg" alt></p>
+<h3 id="敏捷理念解读"><a class="markdownIt-Anchor" href="#敏捷理念解读"></a> 敏捷理念解读</h3>
+<h4 id="深入理解敏捷理念"><a class="markdownIt-Anchor" href="#深入理解敏捷理念"></a> 深入理解敏捷理念</h4>
+<ul>
+<li>
+<p>聚焦客户价值</p>
+<blockquote>
+<p>标识和消除软件开发中的浪费</p>
+<p>交付刚刚好的系统</p>
+<p>随时构建质量，不容忍缺陷</p>
+<p>及时消除技术债务，持续保持快速响应</p>
+</blockquote>
+</li>
+<li>
+<p>激发团队</p>
+<blockquote>
+<p>认清团队的基本事实</p>
+<p>敏捷方式下管理者的转变</p>
+<p>敏捷方式下团队成员的转变</p>
+</blockquote>
+</li>
+<li>
+<p>适应变化</p>
+<blockquote>
+<p>认清“客户是逐步发现真正需求”</p>
+<p>小批量是快速交互的关键</p>
+<p>通过迭代计划不断调整以适应需求变化</p>
+<p>应持续保持良好的软件架构</p>
+<p>利用多层次反馈不断调整以逼近目标</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="标识和消除软件开发中的浪费"><a class="markdownIt-Anchor" href="#标识和消除软件开发中的浪费"></a> 标识和消除软件开发中的浪费</h4>
+<ul>
+<li>
+<p>部分完成的工作</p>
+<blockquote>
+<p>部分完成但没有最终落地的工作（没有转化成代码的设计文档；未及时合入的代码导致引发后续更多同步工作量）。</p>
+</blockquote>
+</li>
+<li>
+<p>未应用特性</p>
+<blockquote>
+<p>开发完成但没有被客户应用的特性。</p>
+</blockquote>
+</li>
+<li>
+<p>再次学习</p>
+<blockquote>
+<p>人员频繁流动导致经验不能积累，反复重新学习；在多个环节移交时，接收信息者也需要重新学习；拥有某领域的专家，但在开发过程中需要领域经验时，他却没有参与，而是团队重新摸索。</p>
+</blockquote>
+</li>
+<li>
+<p>移交</p>
+<blockquote>
+<p>知识信息的传递时伴随信息丢失，隐形知识尤甚困难，分工过细往往导致过多不必要的移交，比如详细设计和实现分离，造成大量设计信息丢失。</p>
+</blockquote>
+</li>
+<li>
+<p>任务切换</p>
+<blockquote>
+<p>研究表明多任务工作会导致效率下降20%-40%（员工多头工作或者杂事繁多）。</p>
+</blockquote>
+</li>
+<li>
+<p>延迟</p>
+<blockquote>
+<p>因任务或者资源相互依赖而导致工作停滞</p>
+</blockquote>
+</li>
+<li>
+<p>缺陷</p>
+<blockquote>
+<p>解决缺陷活动本身就是浪费，而且缺陷遗留到后端浪费越大。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="交付刚刚好的系统"><a class="markdownIt-Anchor" href="#交付刚刚好的系统"></a> 交付刚刚好的系统</h4>
+<ul>
+<li>
+<p>在项目明显超负荷时，管理者简单地期望靠团队 work harder 来解决，最终导致：</p>
+<blockquote>
+<p>质量下降</p>
+<p>项目延期</p>
+<p>客户不满意</p>
+<p>团队疲劳</p>
+<p>埋下长期隐患</p>
+</blockquote>
+</li>
+<li>
+<p>当质量、进度、资源冲突时，能改变的只有项目范围，即选择“交付刚刚好的系统”</p>
+<blockquote>
+<p>产品交付前，客户往往期望多而全的功能，产品交付后，客户把稳定的质量放在首位，尤其在电信领域，客户对产品质量要求是Always work，不是Sometimes。</p>
+<p>与其时为了满足多而全的功能导致交付延迟，质量不稳定，不如按时交付刚刚好的系统，保证其高质量运行。</p>
+<p>交付刚刚好的系统，基于对客户需求的深入理解，并花时间了解细节，简化需求（降低复杂性）而不是简单地拒绝需求。</p>
+<p>做到“交付刚刚好的系统”，同时<strong>需要管理者有足够的勇气和果断决策</strong></p>
+</blockquote>
+</li>
+</ul>
+<h4 id="消除技术债务"><a class="markdownIt-Anchor" href="#消除技术债务"></a> 消除技术债务</h4>
+<ul>
+<li>
+<p>常见技术债务</p>
+<blockquote>
+<p>日益腐烂的架构、圈复杂度高的代码、低的测试自动化率、不及时清除的静态检查告警等。</p>
+<p>异常处理不完善</p>
+</blockquote>
+</li>
+<li>
+<p>为什么会有技术债务</p>
+<blockquote>
+<p>为了满足短期商业目标，不影响其外部表现的情况下，会在技术方面进行一定的让步，这种让步虽然对当前版本的质量影响甚微，但会严重影响后续版本响应客户需求的能力，从而形成技术债务。</p>
+</blockquote>
+</li>
+<li>
+<p>对待技术债务的态度</p>
+<blockquote>
+<p>技术债务是有成本的，如不及时偿还，会随时间积累利息变高，导致开发效率大幅下降，从而降低客户响应能力。因此对待技术债务的态度是加以管理并及时偿还（比如及时重构、服务治理）。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="激发团队认清团队的基本事实"><a class="markdownIt-Anchor" href="#激发团队认清团队的基本事实"></a> 激发团队，认清团队的基本事实</h4>
+<p><img src="/2019/02/12/agile/tdss.jpg" alt></p>
+<h4 id="管理者转变"><a class="markdownIt-Anchor" href="#管理者转变"></a> 管理者转变</h4>
+<p><img src="/2019/02/12/agile/glzzb.jpg" alt></p>
+<h4 id="团队成员转变"><a class="markdownIt-Anchor" href="#团队成员转变"></a> 团队成员转变</h4>
+<p><img src="/2019/02/12/agile/tdcyzb.jpg" alt></p>
+<h4 id="调整拥抱变化"><a class="markdownIt-Anchor" href="#调整拥抱变化"></a> 调整，拥抱变化</h4>
+<p><img src="/2019/02/12/agile/tdtzsybh.jpg" alt></p>
+<h4 id="持续保持良好的软件架构"><a class="markdownIt-Anchor" href="#持续保持良好的软件架构"></a> 持续保持良好的软件架构</h4>
+<p><img src="/2019/02/12/agile/bclhrjjg.jpg" alt></p>
+<h3 id="敏捷实践解读"><a class="markdownIt-Anchor" href="#敏捷实践解读"></a> 敏捷实践解读</h3>
+<h4 id="敏捷实践概览"><a class="markdownIt-Anchor" href="#敏捷实践概览"></a> 敏捷实践概览</h4>
+<p><img src="/2019/02/12/agile/jdmjgl.jpg" alt></p>
+<h4 id="敏捷软件开发典型场景"><a class="markdownIt-Anchor" href="#敏捷软件开发典型场景"></a> 敏捷软件开发典型场景</h4>
+<p><img src="/2019/02/12/agile/jdmjkfcj.jpg" alt></p>
+<h4 id="敏捷开发核心迭代开发"><a class="markdownIt-Anchor" href="#敏捷开发核心迭代开发"></a> 敏捷开发核心——迭代开发</h4>
+<p><img src="/2019/02/12/agile/jdddkf.jpg" alt></p>
+<h4 id="团队的三个核心角色"><a class="markdownIt-Anchor" href="#团队的三个核心角色"></a> 团队的三个核心角色</h4>
+<p><img src="/2019/02/12/agile/jdmjhxjs.jpg" alt></p>
+<h4 id="角色职责"><a class="markdownIt-Anchor" href="#角色职责"></a> 角色职责</h4>
+<p><img src="/2019/02/12/agile/jdjszz.jpg" alt></p>
+<h4 id="完整团队"><a class="markdownIt-Anchor" href="#完整团队"></a> 完整团队</h4>
+<p><img src="/2019/02/12/agile/jdwztd.jpg" alt></p>
+<h4 id="敏捷工作件产品backlog"><a class="markdownIt-Anchor" href="#敏捷工作件产品backlog"></a> 敏捷工作件：产品Backlog</h4>
+<p><img src="/2019/02/12/agile/jdcpblog.jpg" alt></p>
+<h4 id="敏捷工作件迭代backlog"><a class="markdownIt-Anchor" href="#敏捷工作件迭代backlog"></a> 敏捷工作件：迭代Backlog</h4>
+<p><img src="/2019/02/12/agile/jdddblog.jpg" alt></p>
+<h4 id="敏捷工作件完成标准"><a class="markdownIt-Anchor" href="#敏捷工作件完成标准"></a> 敏捷工作件：完成标准</h4>
+<p><img src="/2019/02/12/agile/jdwcbj.jpg" alt></p>
+<h4 id="敏捷管理实践迭代计划会议"><a class="markdownIt-Anchor" href="#敏捷管理实践迭代计划会议"></a> 敏捷管理实践：迭代计划会议</h4>
+<p><img src="/2019/02/12/agile/jdddhyjh.jpg" alt></p>
+<h4 id="敏捷管理实践每日站立会议"><a class="markdownIt-Anchor" href="#敏捷管理实践每日站立会议"></a> 敏捷管理实践：每日站立会议</h4>
+<p><img src="/2019/02/12/agile/jdmrzlhy.jpg" alt></p>
+<h4 id="敏捷管理实践可视化管理"><a class="markdownIt-Anchor" href="#敏捷管理实践可视化管理"></a> 敏捷管理实践：可视化管理</h4>
+<p><img src="/2019/02/12/agile/jdkshgl.jpg" alt></p>
+<h4 id="敏捷管理实践迭代验收"><a class="markdownIt-Anchor" href="#敏捷管理实践迭代验收"></a> 敏捷管理实践：迭代验收</h4>
+<p><img src="/2019/02/12/agile/jdddys.jpg" alt></p>
+<h4 id="敏捷管理实践迭代回顾会议"><a class="markdownIt-Anchor" href="#敏捷管理实践迭代回顾会议"></a> 敏捷管理实践：迭代回顾会议</h4>
+<p><img src="/2019/02/12/agile/jdddhghy.jpg" alt></p>
+<h4 id="敏捷工程实践用户故事"><a class="markdownIt-Anchor" href="#敏捷工程实践用户故事"></a> 敏捷工程实践：用户故事</h4>
+<p><img src="/2019/02/12/agile/jdyhgs.jpg" alt></p>
+<h4 id="敏捷工程实践持续集成ci"><a class="markdownIt-Anchor" href="#敏捷工程实践持续集成ci"></a> 敏捷工程实践：持续集成(CI)</h4>
+<p><img src="/2019/02/12/agile/jdci.jpg" alt></p>
+<h1 id="研发管理流程"><a class="markdownIt-Anchor" href="#研发管理流程"></a> 研发管理流程</h1>
+<h2 id="团队角色"><a class="markdownIt-Anchor" href="#团队角色"></a> 团队角色</h2>
+<table>
+<thead>
+<tr>
+<th>角色名称</th>
+<th>职责</th>
+<th>是否必须</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>项目经理</td>
+<td>1、业务目标、进度、成本、质量控制<br>2、团队建设、激发、鼓励和改进团队的效率<br>3、定期向干系人汇报，并作为团队和外部的接口，屏蔽外界对团队的干扰<br>4、确保项目流程被遵循、组织、监督和培训</td>
+<td>必须</td>
+</tr>
+<tr>
+<td>产品策划</td>
+<td>1、确定产品的功能、拆分用户故事<br>2、确定需求优先级<br>3、接受和拒绝开放团队的工作成果<br>4、参与产品开发过程中的有关会议</td>
+<td>必须</td>
+</tr>
+<tr>
+<td>UI</td>
+<td>1、根据用户故事，负责产品的功能交互及界面设计<br>2、组织开展人机交互及用户体验，不断跟踪改进，提高产品表现力<br>3、参与产品开发过程中的有关会议</td>
+<td>非必须</td>
+</tr>
+<tr>
+<td>开发</td>
+<td>1、根据用户故事，负责产品的技术架构设计及功能开发<br>2、评估、设计及维护产品相应模块，确保模块的稳定性、易用性、高效性<br>3、参加产品开发过程中的有关会议</td>
+<td>必须</td>
+</tr>
+<tr>
+<td>测试</td>
+<td>1、根据用户故事，设计产品测试标准，确保产品品质满足市场需求<br>2、合理分配测试资源，组织产品测试并优化测试流程及测试标准，提高测试效率<br>3、编写产品测试用例，提交测试问题，编写测试总结报告，以测试角度来确定产品版本是否发布</td>
+<td>必须</td>
+</tr>
+</tbody>
+</table>
+<h2 id="研发过程"><a class="markdownIt-Anchor" href="#研发过程"></a> 研发过程</h2>
+<h3 id="研发流程阶段"><a class="markdownIt-Anchor" href="#研发流程阶段"></a> 研发流程阶段</h3>
+<p>敏捷管理过程，可以分为：立项过程、规划过程、执行与监控过程、结项过程。</p>
+<p>这里借鉴华为的IPD流程，来描述敏捷管理过程，如图所示：</p>
+<p><img src="/2019/02/12/agile/%E6%B5%81%E7%A8%8B.png" alt><br>
+CP：Check Point</p>
+<table>
+<thead>
+<tr>
+<th>评审点</th>
+<th>功能</th>
+<th>输入</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R0</td>
+<td>评审点：项目启动评审。<br>通过标志：项目任务书被确认和评审通过。<br>目的：确保该项目在前期已经站在组织角度考虑了项目的商业战略符合度，<br>确保以客户为中心，并且考虑了可行性。</td>
+<td>项目立项需求</td>
+<td>* 待批准的项目任务书<br> * 项目状态报告<br>* 需求规格书<br>* 汇报ppt</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>评审点：项目概念阶段结束时的评审。<br>通过标志：项目概念与初步项目计划的确认<br>目的：确保该项目的执行策略是建立在业务和技术可行性充分分析的基础之上，<br>项目的进展与组织的业务策略上下对齐。</td>
+<td>被批准的项目任务书</td>
+<td>* 初步项目集成计划<br>* 计划阶段详细计划<br>* 项目状态报告<br> * 刷新的需求规格书 <br> * 汇报ppt <br> * 初步的质量策划方案 <br> * 项目预算 <br>* 细化的目标成本 <br> * 备选方案 和资源预算 <br> * 风险分析报告</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>评审点：项目计划阶段结束时的项目评审<br>通过标志：最终项目计划被确认和批准<br>目的：保证整个项目的实施计划的系统性和可行性，并与项目的最终目标对齐。</td>
+<td>需求规格书<br> 项目设计方案 <br> 目标 <br> 组织资源使用状态 <br> 相关基线数据 <br> 组织过程资产</td>
+<td>项目：目标、策略、价值、范围<br> 利益干系人分析汇总<br>质量计划<br> 目标成本<br> 进度表和预算 <br> 风险管理计划 <br> 风险响应计划 <br> 人力资源计划 <br> 组织模式 和运作方式<br> 沟通计划 <br> 需求规格书<br> 分解规格书<br> 初步的采购合同<br> 刷新的需求规格书<br> 项目状态报告 <br> 汇报ppt</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>评审点：开发阶段结束时的评审点<br>通过标志：项目开发工作按计划完成，可将交付物提供给接收人/客户验收。<br>目的：确认项目开发交互件的质量和范围与项目目标一致、与组织的业务策略一致。</td>
+<td>需求规格书<br> 项目计划书<br>变更请求<br> 项目状态报告</td>
+<td>待验证的项目交付件<br> 项目状态报告<br> 刷新的需求规格书<br> 修订的供应商合同<br> 修订人力资源计划<br> 经批准的变更请求<br> 待批准的项目验证计划/策略<br> 汇报ppt</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>评审点：项目验证结束时的评审<br>通过标志：输出及交付件通过验收<br>目的：确保项目的交付件已验收且后继项目质量可以得到保证。</td>
+<td>待验证的交付件<br>刷新的项目任务书<br> 确认的需求规格清单<br> 项目计划书<br> 变更请求<br> 项目状态报告</td>
+<td>项目验收报告<br>项目状态报告<br>汇报ppt<br>待发布的交付件<br>汇报ppt</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>评审点：发布阶段结束时的项目评审<br>通过标志：项目结束<br>目的：进行项目经验总结汇报，确认项目按照计划完成，并批准项目关闭。</td>
+<td>验证后的交付件<br> 验收标准<br>项目计划书<br>变更请求<br>项目状态报告</td>
+<td>项目发布通告<br>项目状态报告<br>项目移交报告<br>最终的交付件<br>汇报ppt</td>
+</tr>
+</tbody>
+</table>
+<h3 id="评审要素"><a class="markdownIt-Anchor" href="#评审要素"></a> 评审要素：</h3>
+<table>
+<thead>
+<tr>
+<th>项目目标对齐</th>
+<th>资源承诺</th>
+<th>项目状态</th>
+<th>项目组合状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>* 商业目标对齐<br>* 组织要求对齐</td>
+<td>* 资源投入保障</td>
+<td>* 项目价值<br>* 进度偏差<br>* 质量状态<br>* 项目风险<br>* 采购准备度<br>* 计划<br>* 范围<br>* 技术准备度<br>* 费用 和人力<br>* 目标成本达成度</td>
+<td>* 项目优先级排序<br>* 人力投入及使用<br>* 依赖关系</td>
+</tr>
+</tbody>
+</table>
+<h3 id="生命周期模型在版本研发项目中的应用"><a class="markdownIt-Anchor" href="#生命周期模型在版本研发项目中的应用"></a> 生命周期模型在版本研发项目中的应用</h3>
+<p><img src="/2019/02/12/agile/%E5%85%B3%E9%94%AE%E6%B4%BB%E5%8A%A8.png" alt></p>
+<blockquote>
+<p>说明：</p>
+<table>
+<thead>
+<tr>
+<th>TRX</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TR1</td>
+<td>产品包需求、设计需求评审</td>
+</tr>
+<tr>
+<td>TR2</td>
+<td>产品整体设计（系统设计规格）</td>
+</tr>
+<tr>
+<td>TR3</td>
+<td>模块概要设计</td>
+</tr>
+<tr>
+<td>TR4</td>
+<td>详细设计、模块测试</td>
+</tr>
+<tr>
+<td>TR4A</td>
+<td>软件产品联调、需求功能全面测试、性能摸底</td>
+</tr>
+<tr>
+<td>TR5</td>
+<td>软件产品性能全面测试</td>
+</tr>
+<tr>
+<td>TR6</td>
+<td>BETA</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<h3 id="产品开发v-模型"><a class="markdownIt-Anchor" href="#产品开发v-模型"></a> 产品开发V 模型</h3>
+<p><img src="/2019/02/12/agile/V.jpg" alt></p>
+<h3 id="阶段责任人主题"><a class="markdownIt-Anchor" href="#阶段责任人主题"></a> 阶段责任人主题</h3>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>阶段简介</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Charter</td>
+<td>责任主体：Marketing 团队和SE<br>主要工作：Charter 需要回答这些问题：版本的TOP N 需求和主要竞争需求，主要目标客户，完整的包需求，版本的里程碑时间点，应用的时间窗口以及在版本火车中所处的位置。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Charter-TR1</td>
+<td>责任主体：SE团队，同时Marketing 团队配合完成需求的细化、澄清和修订。<br>主要工作：输出设计需求（包括每个需求的输入、输出参数、并输出低保真界面原型）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>CDCP</td>
+<td>责任主体：<br>主要工作：被裁剪，具体作用不明</td>
+</tr>
+<tr>
+<td>4</td>
+<td>TR1-TR2</td>
+<td>责任主体：SE团队<br>主要工作：输出设计规格（接口设计、高保真界面原型）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PDCP</td>
+<td>责任主体：开发代表<br>主要工作：代码规模、关键时间点和人力需求。质量目标、SOW（工作任务书）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>TR2-TR3</td>
+<td>责任主体：开发组<br>主要工作：需求规格说明书（SRS）、系统测试用例（STC）、概要设计（HLD）、集成测试用例（ITC）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>TR3-TR4</td>
+<td>责任主体：开发组<br>主要工作：详细设计（LLD）、单元测试用例（UTC）、编码（Coding）、及自测阶段（UT/IT/ST/BBIT）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>TR4-TR4A</td>
+<td>责任主体：测试部<br>主要工作：测试部的EVT测试阶段（2+1的测试），验证测试。</td>
+</tr>
+<tr>
+<td>9</td>
+<td>TR4A-TR5</td>
+<td>责任主体：测试部<br>主要工作：DVT，是对设计需求的验证测试。</td>
+</tr>
+<tr>
+<td>10</td>
+<td>TDCP</td>
+<td>责任主体：开发代表<br>主要工作：这个里程碑意味着产品主要开发活动的结束。开发代表需要邀请下游用户、测试等相关干系人参与评审。评审的标准是产品的遗留缺陷。各域的代表会关心这些遗留缺陷是否确实影响用户的使用，有没有规避的方法。</td>
+</tr>
+<tr>
+<td>11</td>
+<td>TR5-TR6</td>
+<td>责任主体：<br>主要工作：TR5到TR6 实验局阶段，也是PVT（对包需求的确认测试）。</td>
+</tr>
+<tr>
+<td>12</td>
+<td>TR6-GA</td>
+<td>责任主体：<br>主要工作：维护阶段</td>
+</tr>
+<tr>
+<td>13</td>
+<td>GA</td>
+<td>责任主体：<br>主要工作：生命周期的结束。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="敏捷实施"><a class="markdownIt-Anchor" href="#敏捷实施"></a> 敏捷实施</h2>
+<h3 id="华为敏捷三步走案例"><a class="markdownIt-Anchor" href="#华为敏捷三步走案例"></a> 华为敏捷三步走案例</h3>
+<p><img src="/2019/02/12/agile/scsbz.jpg" alt></p>
+<h3 id="三走解读"><a class="markdownIt-Anchor" href="#三走解读"></a> 三走解读</h3>
+<h4 id="项目级敏捷"><a class="markdownIt-Anchor" href="#项目级敏捷"></a> 项目级敏捷</h4>
+<p><img src="/2019/02/12/agile/sbzxmj.jpg" alt></p>
+<h4 id="版本级敏捷"><a class="markdownIt-Anchor" href="#版本级敏捷"></a> 版本级敏捷</h4>
+<p><img src="/2019/02/12/agile/sbzbbj.jpg" alt></p>
+<h4 id="产品级敏捷"><a class="markdownIt-Anchor" href="#产品级敏捷"></a> 产品级敏捷</h4>
+<p><img src="/2019/02/12/agile/sbzcpj.jpg" alt></p>
+<h3 id="八步曲"><a class="markdownIt-Anchor" href="#八步曲"></a> 八步曲</h3>
+<p><img src="/2019/02/12/agile/bzbbq.jpg" alt></p>
+<h3 id="可能的角色人选"><a class="markdownIt-Anchor" href="#可能的角色人选"></a> 可能的角色人选</h3>
+<p><img src="/2019/02/12/agile/bzjsrx.jpg" alt></p>
+<h3 id="其他敏捷相关角色在华为对应的角色"><a class="markdownIt-Anchor" href="#其他敏捷相关角色在华为对应的角色"></a> 其他敏捷相关角色在华为对应的角色</h3>
+<p><img src="/2019/02/12/agile/xgjsdyjs.jpg" alt></p>
+<h3 id="项目级敏捷实施场景"><a class="markdownIt-Anchor" href="#项目级敏捷实施场景"></a> 项目级敏捷实施场景</h3>
+<h4 id="场景1"><a class="markdownIt-Anchor" href="#场景1"></a> 场景1</h4>
+<p><img src="/2019/02/12/agile/sscj1.jpg" alt></p>
+<h4 id="场景2"><a class="markdownIt-Anchor" href="#场景2"></a> 场景2</h4>
+<p><img src="/2019/02/12/agile/sscj2.jpg" alt></p>
+<h4 id="场景3"><a class="markdownIt-Anchor" href="#场景3"></a> 场景3</h4>
+<p><img src="/2019/02/12/agile/sscj3.jpg" alt></p>
+<h3 id="项目级敏捷过程样例版本中项目全都实施敏捷"><a class="markdownIt-Anchor" href="#项目级敏捷过程样例版本中项目全都实施敏捷"></a> 项目级敏捷过程样例（版本中项目全都实施敏捷）</h3>
+<p><img src="/2019/02/12/agile/sscmj.jpg" alt></p>
+<h3 id="项目级敏捷过程说明"><a class="markdownIt-Anchor" href="#项目级敏捷过程说明"></a> 项目级敏捷过程说明</h3>
+<p><img src="/2019/02/12/agile/xmjylsm.jpg" alt></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/01/08/rzf2019xnjh/" rel="bookmark">任正非新年致全体员工信</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/04/17/ywxtjk/" rel="bookmark">业务监控系统设计</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/03/23/psxtsj/" rel="bookmark">推送系统设计</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/09/01/cxyznqy/" rel="bookmark">前言</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/03/08/skll/" rel="bookmark">思考的力量</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/02/12/agile/" title="敏捷研发流程实践">https://tech-insq.github.io/2019/02/12/agile/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 软件</a>
+              <a href="/tags/%E6%80%9D%E6%83%B3/" rel="tag"><i class="fa fa-tag"></i> 思想</a>
+              <a href="/tags/%E5%8E%9F%E5%88%99/" rel="tag"><i class="fa fa-tag"></i> 原则</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/02/10/alibbdztxqt/" rel="prev" title="阿里巴巴“大中台、小前台”读后感">
+                  <i class="fa fa-chevron-left"></i> 阿里巴巴“大中台、小前台”读后感
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/03/08/skll/" rel="next" title="思考的力量">
+                  思考的力量 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

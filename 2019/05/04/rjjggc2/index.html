@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="前言 ​    本篇文章还是继续将软件架构过程，包含：  确定并引入利益相关者 识别并使用场景 使用样式和模式 创建架构模型 创建架构描述 评估架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件架构过程（下）">
+<meta property="og:url" content="https://tech-insq.github.io/2019/05/04/rjjggc2/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="前言 ​    本篇文章还是继续将软件架构过程，包含：  确定并引入利益相关者 识别并使用场景 使用样式和模式 创建架构模型 创建架构描述 评估架构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-05-04T09:44:18.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:13:58.210Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构 - 原则">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/05/04/rjjggc2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/05/04/rjjggc2/","path":"2019/05/04/rjjggc2/","title":"软件架构过程（下）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>软件架构过程（下） | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text"> 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E5%85%A5%E5%88%A9%E7%9B%8A%E7%9B%B8%E5%85%B3%E8%80%85"><span class="nav-number">2.</span> <span class="nav-text"> 引入利益相关者</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%BD%E7%9A%84%E5%88%A9%E7%9B%8A%E7%9B%B8%E5%85%B3%E8%80%85%E6%A0%87%E5%87%86"><span class="nav-number">2.1.</span> <span class="nav-text"> 好的利益相关者标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%9B%8A%E7%9B%B8%E5%85%B3%E8%80%85%E7%9A%84%E7%B1%BB%E5%88%AB"><span class="nav-number">2.2.</span> <span class="nav-text"> 利益相关者的类别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5-%E5%8E%9F%E5%88%99"><span class="nav-number">2.3.</span> <span class="nav-text"> 策略、原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%9B%8A%E7%9B%B8%E8%80%85%E7%9A%84%E8%B4%A3%E4%BB%BB"><span class="nav-number">2.4.</span> <span class="nav-text"> 利益相者的责任</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%86%E5%88%AB%E5%B9%B6%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.</span> <span class="nav-text"> 识别并使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text"> 场景的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%95%E8%8E%B7%E5%9C%BA%E6%99%AF"><span class="nav-number">3.2.</span> <span class="nav-text"> 捕获场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%BD%E5%9C%BA%E6%99%AF"><span class="nav-number">3.3.</span> <span class="nav-text"> 好场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B0%E6%9F%A5"><span class="nav-number">3.4.</span> <span class="nav-text"> 走查</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%A0%B7%E5%BC%8F%E5%92%8C%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text"> 使用样式和模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">4.1.</span> <span class="nav-text"> 概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E8%A8%80%E6%83%AF%E7%94%A8%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text"> 语言惯用法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text"> 创建架构模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">5.1.</span> <span class="nav-text"> 模型的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%9C%89%E6%95%88%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%87%86%E5%88%99"><span class="nav-number">5.2.</span> <span class="nav-text"> 创建有效模型的准则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%9E%B6%E6%9E%84%E6%8F%8F%E8%BF%B0"><span class="nav-number">6.</span> <span class="nav-text"> 创建架构描述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5"><span class="nav-number">6.1.</span> <span class="nav-text"> 策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%9E%B6%E6%9E%84"><span class="nav-number">7.</span> <span class="nav-text"> 评估架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88"><span class="nav-number">7.1.</span> <span class="nav-text"> 为什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%8A%80%E6%9C%AF"><span class="nav-number">7.2.</span> <span class="nav-text"> 评估技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%9C%BA%E6%99%AF%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95"><span class="nav-number">7.3.</span> <span class="nav-text"> 基于场景的评估方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E7%8E%B0%E5%AD%98%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9E%B6%E6%9E%84"><span class="nav-number">7.4.</span> <span class="nav-text"> 验证现存系统的架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95%E8%AF%84%E4%BC%B0%E7%BB%93%E6%9E%9C"><span class="nav-number">7.5.</span> <span class="nav-text"> 记录评估结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95"><span class="nav-number">7.6.</span> <span class="nav-text"> 选择评估方法</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/05/04/rjjggc2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          软件架构过程（下）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-05-04 17:44:18" itemprop="dateCreated datePublished" datetime="2019-05-04T17:44:18+08:00">2019-05-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:13:58" itemprop="dateModified" datetime="2021-11-30T22:13:58+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h1>
+<p>​    本篇文章还是继续将软件架构过程，包含：</p>
+<ul>
+<li>确定并引入利益相关者</li>
+<li>识别并使用场景</li>
+<li>使用样式和模式</li>
+<li>创建架构模型</li>
+<li>创建架构描述</li>
+<li>评估架构</li>
+</ul>
+<span id="more"></span>
+<h1 id="引入利益相关者"><a class="markdownIt-Anchor" href="#引入利益相关者"></a> 引入利益相关者</h1>
+<h2 id="好的利益相关者标准"><a class="markdownIt-Anchor" href="#好的利益相关者标准"></a> 好的利益相关者标准</h2>
+<table>
+<thead>
+<tr>
+<th>标准</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>见识广</td>
+<td>利益相关者是否拥有很多做出正确决定所需要的信息、经验和理解？</td>
+</tr>
+<tr>
+<td>有担当</td>
+<td>利益相关者是否愿意并能够让自己参与这个过程，并且是否准备做出很困难的决定？</td>
+</tr>
+<tr>
+<td>有权威</td>
+<td>利益相关者所做出的决定在将来不会推翻？</td>
+</tr>
+<tr>
+<td>有代表性</td>
+<td>这些利益相关者的需求是否满足代表性？</td>
+</tr>
+</tbody>
+</table>
+<h2 id="利益相关者的类别"><a class="markdownIt-Anchor" href="#利益相关者的类别"></a> 利益相关者的类别</h2>
+<ul>
+<li>市场人员（产品经理、运营）</li>
+<li>老板</li>
+<li>出资方</li>
+<li>评估者</li>
+<li>沟通者</li>
+<li>开发代表</li>
+<li>维护人员代表</li>
+<li>生产工程师</li>
+<li>供应商</li>
+<li>支持人员</li>
+<li>系统管理员（运维）</li>
+<li>测试人员</li>
+<li>用户</li>
+</ul>
+<h2 id="策略-原则"><a class="markdownIt-Anchor" href="#策略-原则"></a> 策略、原则</h2>
+<p><strong>策略</strong>：</p>
+<p>​     如果你拥有大型的利益相关者，那么需要积极地对其进行管理，从而确保它的规模不会阻碍进程。特别是需要对不同利益相关者组的需求进行平衡和按优先级排序，从而当发生冲突的时候，你能够做出合理、理由充分的决定。</p>
+<p><strong>原则：</strong></p>
+<p>​    架构必须确保有全面、充分的利益相关者代表，包括非技术的利益相关者 和专注于技术的利益相关者。</p>
+<h2 id="利益相者的责任"><a class="markdownIt-Anchor" href="#利益相者的责任"></a> 利益相者的责任</h2>
+<ul>
+<li>确保能够和架构师清晰地沟通所有关注点。</li>
+<li>向架构师清晰地转达他所代表的所有关注点。</li>
+<li>会及时做出有权威的决定，并坚持到底。</li>
+<li>如果他们没有做出决定的权威，那么他们会适当升级，并从有权力的人获得决定。</li>
+<li>会架构描述进行评估，以确保系统满足了他们的关注点，并且尽可能确保功能的正确性。</li>
+</ul>
+<h1 id="识别并使用场景"><a class="markdownIt-Anchor" href="#识别并使用场景"></a> 识别并使用场景</h1>
+<p><strong>架构场景</strong></p>
+<p>​    架构场景是一种对外部实体和系统之间交互的明确定义的描述。它定义了触发场景的事件、外部实体初始化的交互过程以及需要系统所做出的响应。</p>
+<p><strong>场景类型：</strong></p>
+<ul>
+<li>
+<p>功能性场景（用例）</p>
+<p>比如支付系统的充值、提现、转账、退款。</p>
+</li>
+<li>
+<p>质量性场景（用例）</p>
+<p>比如支付系统的安全（信息存储安全、登录安全、支付安全）、性能（每秒的交易笔数）、可用性、演进。</p>
+</li>
+</ul>
+<h2 id="场景的使用"><a class="markdownIt-Anchor" href="#场景的使用"></a> 场景的使用</h2>
+<ul>
+<li>为架构定义提供输入</li>
+<li>定义并验证系统范围</li>
+<li>评估架构</li>
+<li>与利益相关者沟通</li>
+<li>发现遗漏的需求</li>
+<li>驱动测试过程</li>
+</ul>
+<h2 id="捕获场景"><a class="markdownIt-Anchor" href="#捕获场景"></a> 捕获场景</h2>
+<table>
+<thead>
+<tr>
+<th>功能性场景</th>
+<th>质量性场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>概述：对场景进行简要描述</td>
+<td>概述：对场景进行简要描述</td>
+</tr>
+<tr>
+<td>系统状态：场景发生前系统的状态</td>
+<td>系统状态：场景发生前系统的状态</td>
+</tr>
+<tr>
+<td>系统环境：对系统运行其中的环境的所有重大观察结果</td>
+<td>系统环境：对系统运行其中的环境的所有重大观察结果</td>
+</tr>
+<tr>
+<td>外部刺激：定义是什么导致场景的出现</td>
+<td>环境变化：说明系统环境中发生了什么变化才导致了场景的出现</td>
+</tr>
+<tr>
+<td>所需系统响应：做出何种响应的说明</td>
+<td>所需系统行为：定义系统必须对所处环境的变化做出什么样的响应</td>
+</tr>
+</tbody>
+</table>
+<h2 id="好场景"><a class="markdownIt-Anchor" href="#好场景"></a> 好场景</h2>
+<ul>
+<li>可信</li>
+<li>有价值</li>
+<li>明确</li>
+<li>精确</li>
+<li>可理解</li>
+</ul>
+<h2 id="走查"><a class="markdownIt-Anchor" href="#走查"></a> 走查</h2>
+<ul>
+<li>是否定义足够广泛的系统质量场景（安全性、性能、可用性、演进）</li>
+<li>是否定义并应用了范围足够广泛的故障和异常场景</li>
+<li>是否根据利益相关者的重要性和风险对场景进行优先级排序</li>
+<li>是否把场景的数量限定在可管理的级别上，约15～20种</li>
+<li>是否已经和合适的利益相关者或者专门主题的专家在一起审查了所需的响应和行为，并达成了一致的意见</li>
+<li>是否包含了利益相关者提出的场景，也包含了你认为有价值的一些场景</li>
+<li>是否对场景进行分类和命名</li>
+<li>是否已经确定了已经解决那些问题</li>
+<li>是否根据场景所述的和实际的响应之间的匹配，对架构进行适当地修改</li>
+</ul>
+<h1 id="使用样式和模式"><a class="markdownIt-Anchor" href="#使用样式和模式"></a> 使用样式和模式</h1>
+<p>样式和模式的目的是要以标准形式共享针对特定设计问题已经过验证、广泛可用的解决方案，从而让人易于重用。它们包含三种类型的设计模式：</p>
+<ul>
+<li>架构样式：它会记录系统级的结构</li>
+<li>软件设计模式：它会记录软件设计解决方案的细节</li>
+<li>语言惯用法：它会重现针对特定编程语言的设计问题提供解决方案。</li>
+</ul>
+<h2 id="概念"><a class="markdownIt-Anchor" href="#概念"></a> 概念</h2>
+<p><strong>架构样式</strong></p>
+<p>架构样式说明的是软件系统最基本的结构组织模式。它提供了一系列预定义的元素类型，指定了它们的责任，并包含了组织它们之间的关系规则和指南。</p>
+<p>架构样式记录：MVC、管道过滤模式、MPR（Map Reduce）、生产者-消费者、Lambada、适配模式、代理模式。</p>
+<p><strong>设计模式</strong></p>
+<p>设计模式记录的是相互连接的设计元素经常出现并经过验证的结构，它会在特定的场景下解决通用的设计问题。</p>
+<p>比如GOF 23 种设计模式。</p>
+<h2 id="语言惯用法"><a class="markdownIt-Anchor" href="#语言惯用法"></a> 语言惯用法</h2>
+<p>语言惯用法是针对特定编程语言的模式。惯用法通过给定语言的特性，描述如何实现元素的特定方面，或者它们之间的关系。</p>
+<h1 id="创建架构模型"><a class="markdownIt-Anchor" href="#创建架构模型"></a> 创建架构模型</h1>
+<p><strong>定义</strong></p>
+<p><strong>架构模型</strong> 是对架构某些方面的抽象、简化或者部分展现，它的目的是要用来与一位或多位利益相关者沟通系统的相应那部分内容。</p>
+<p><strong>原则</strong></p>
+<p>​    每种架构模型都与现实接近，因为它抽象掉了不必要的细节，从而把重点放在最重要的内容上。</p>
+<p><strong>策略</strong></p>
+<p>​    你要让架构模型的复杂度和细节匹配听众的兴趣和技能级别、你所拥有的用于创建模型的时间以及使用模型的方式（最重要）。</p>
+<p><strong>策略</strong></p>
+<p>​    确保你的受众知道模型中的简化和近似的部分，以及这些内容对于理解解决方案会造成什么样的影响。</p>
+<h2 id="模型的类型"><a class="markdownIt-Anchor" href="#模型的类型"></a> 模型的类型</h2>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定性模型</td>
+<td><strong>定性模型</strong> 说明架构的关键结构或行为元素、特性和属性</td>
+</tr>
+<tr>
+<td>定量模型</td>
+<td><strong>定量模型</strong> 声明架构的可度量属性，比如性能、弹性、容量</td>
+</tr>
+</tbody>
+</table>
+<p><strong>策略</strong></p>
+<p>为定性模型选择一种建模语言（UML），在必要的时候对其进行扩展，并且严格地遵照执行。确保提供关键或者其他的说明，从而使你的受众能够理解你所遵循的标记方法和规定。</p>
+<p><strong>示意图</strong></p>
+<p>示意图是一种可交付的非正式图形化模型，创建它是为了将架构最重要的内容与非技术听众沟通。它可能会组合大量关键建模符号元素，以及各种图片和图标。</p>
+<h2 id="创建有效模型的准则"><a class="markdownIt-Anchor" href="#创建有效模型的准则"></a> 创建有效模型的准则</h2>
+<ul>
+<li>有目的地建模</li>
+<li>应对受众</li>
+<li>仔细、准确地抽象</li>
+<li>根据风险确定工作重点</li>
+<li>选择描述性的名称</li>
+<li>定义自己的术语</li>
+<li>以简单为目标</li>
+<li>使用已定义的标记法</li>
+<li>了解暗示的语义</li>
+<li>验证模型</li>
+<li>保持模型的活力</li>
+<li>和敏捷团队一起建模</li>
+</ul>
+<h1 id="创建架构描述"><a class="markdownIt-Anchor" href="#创建架构描述"></a> 创建架构描述</h1>
+<p><strong>定义</strong></p>
+<p><strong>架构描述（AD）</strong> 是一系列产品，它会以利益相关者能够理解的方式来记录架构，并说明架构能够如何满足他们的关注点。</p>
+<p><strong>有效架构描述的属性</strong>：</p>
+<ul>
+<li>正确： 正确描述利益相关者的需要和问题，正确地定义能够满足那些需要的架构。</li>
+<li>充分：包含足够的信息，让利益相关者能够理解你所做出的关键架构决定。</li>
+<li>及时：架构定义的存在是为了指导系统的设计和构建，因此必须及时提供以满足项目的里程碑。</li>
+<li>简洁：为了帮助利益相关者把握架构的关键特性，架构描述需要专注于重要的元素，对架构意义重大的内容不要在其他细节上花费过多时间。</li>
+<li>清晰</li>
+<li>最新</li>
+<li>精确</li>
+</ul>
+<h2 id="策略"><a class="markdownIt-Anchor" href="#策略"></a> 策略</h2>
+<p><strong>充分的策略</strong></p>
+<p>在架构描述中清晰地记录你的关键架构决定，并为有异议或者有内容上替换方案的决定提供基本原理的说明。对于重要的决定，这包括捕获你考虑的替换方案、所有支撑决定所做的假设，以及对为什么你做出这种选择而拒绝其他方案的简要说明。</p>
+<p><strong>及时的策略</strong></p>
+<p>为了在有限的时间内交付有用的架构描述，首先要关注项目所面临的关键风险，其次要以递增的方式交付成果。</p>
+<p><strong>简洁的策略</strong></p>
+<p>把架构描述限制为对架构重要的内容，并把细节的等级根据读者群的经验和技能、问题和解决方案的复杂度，以及产出架构描述所拥有的时间进行裁剪。</p>
+<p><strong>清晰的策略</strong></p>
+<p>当编写架构描述各部分内容时，总是要考虑可能的读者群，并根据他们的技能、知识和能够用来阅读的时间对内容和报告进行裁剪。</p>
+<p><strong>最新的策略</strong></p>
+<p>在开发周期中提前考虑系统描述如何在系统的生命周期内保持最新，并试图确保开发、运维和支持计划考虑到了这种需要。</p>
+<p><strong>精确的策略</strong></p>
+<p>架构描述要以精确为目标，但是当需要大量细节的时候，就要在物理上吧文档切分成多个小型文档，或者把细节放到附录中，从而使主文档不会变得太大。</p>
+<h1 id="评估架构"><a class="markdownIt-Anchor" href="#评估架构"></a> 评估架构</h1>
+<h2 id="为什么"><a class="markdownIt-Anchor" href="#为什么"></a> 为什么？</h2>
+<ul>
+<li>验证抽象</li>
+<li>检查技术正确性</li>
+<li>销售架构</li>
+<li>说明架构</li>
+<li>验证假设</li>
+<li>提供管理决定的时间点</li>
+<li>为正式协议提供基础</li>
+<li>确保技术的完整性</li>
+</ul>
+<h2 id="评估技术"><a class="markdownIt-Anchor" href="#评估技术"></a> 评估技术</h2>
+<table>
+<thead>
+<tr>
+<th>评估技术</th>
+<th>优势</th>
+<th>限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>演进</td>
+<td>1、快速创建演进，容易根据听众进行调整<br>2、成本低，容易操作<br>3、立刻得到反馈</td>
+<td>1、只能很浅层次的分析<br>2、有效性依赖于听众的参与程度和贡献度<br>3、听众没有时间做出反应</td>
+</tr>
+<tr>
+<td>正式评审和结构化的走查</td>
+<td>1、让参与者更好地参与进来</td>
+<td>1、会做大量准备工作<br>2、很难让所有参与者付出充分的时间来准备</td>
+</tr>
+<tr>
+<td>通过使用场景来评估</td>
+<td>1、对特定架构方法优缺点进行深入、细致的分析<br>2、帮助架构团队理解架构决定</td>
+<td>1、更复杂、成本也高。</td>
+</tr>
+<tr>
+<td>原型和概念验证系统</td>
+<td>1、提供具体的验证<br>2、让听众对人员、技术以及使用的过程更有信息</td>
+<td>1、很昂贵，并且会耗费大量的时间。<br>2、快而脏的原型系统往往被抛弃。</td>
+</tr>
+<tr>
+<td>骨架系统</td>
+<td>1、最彻底、最可信的一种架构评估。<br>2、交付成功的骨架系统，会大大提升士气。<br>3、可以在评估活动之外使用。</td>
+<td>1、最昂贵的一种架构评估形式</td>
+</tr>
+</tbody>
+</table>
+<h2 id="基于场景的评估方法"><a class="markdownIt-Anchor" href="#基于场景的评估方法"></a> 基于场景的评估方法</h2>
+<p>最常用的方法：SAAM 和ATAM方法。这里简要描述ATAM：</p>
+<pre class="mermaid">graph TD
+  subgraph 以架构为中心
+  开始 --> 理解业务驱动力
+  理解业务驱动力 --> 展现架构
+  展现架构 --> 识别使用的架构方法
+  识别使用的架构方法 --> 为架构生成质量属性树
+  为架构生成质量属性树 --> 分析使用的架构方法
+  end
+  subgraph 以利益相关者为中心
+  分析使用的架构方法 --> 对场景进行头脑风暴并按优先级排序
+  对场景进行头脑风暴并按优先级排序 --> 分析使用的架构方法
+  分析使用的架构方法 --> 向利益相关者展现结果
+  end</pre>
+<h2 id="验证现存系统的架构"><a class="markdownIt-Anchor" href="#验证现存系统的架构"></a> 验证现存系统的架构</h2>
+<p>系统已经存在，如何验证呢？在这种情况下所需要做的很简单，就是采取一种轻量级的方法——小型架构评审方法（<strong>T</strong>ing <strong>A</strong>rchitectural<strong>R</strong>eview<strong>A</strong>pproach, TARA）。</p>
+<p><strong>一般步骤：</strong></p>
+<ul>
+<li>目的和目标受众</li>
+<li>情境图和需求摘要</li>
+<li>功能性和部署视图的草稿</li>
+<li>系统实现品质</li>
+<li>需求符合</li>
+</ul>
+<h2 id="记录评估结果"><a class="markdownIt-Anchor" href="#记录评估结果"></a> 记录评估结果</h2>
+<ul>
+<li>会议记录</li>
+<li>决定日志</li>
+<li>评审记录</li>
+<li>评估报告</li>
+<li>签字的文档</li>
+</ul>
+<h2 id="选择评估方法"><a class="markdownIt-Anchor" href="#选择评估方法"></a> 选择评估方法</h2>
+<table>
+<thead>
+<tr>
+<th>项目环境</th>
+<th>建议的评估方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小规模、低风险的系统</td>
+<td>1、和关键利益相关者一起进行结构化走查。<br>2、能够发展为生产程序的骨架系统</td>
+</tr>
+<tr>
+<td>大规模、低风险的系统</td>
+<td>1、向关键利益相关者演进，以获得补充意见。<br>2、基于场景的评估，确保架构的合理性<br>3、能够发展为生产程序的骨架系统</td>
+</tr>
+<tr>
+<td>小规模、高风险的系统</td>
+<td>1、基于场景的评估，确保关键场景可以满足<br>2、概念验证系统，解决特定的技术风险<br>3、能够发展为生产程序的骨架系统</td>
+</tr>
+<tr>
+<td>大规模、高风险的系统</td>
+<td>1、向关键利益相关者做演进，说明范围、风险和好处，以获得补充意见<br>2、基于场景的评估，确保架构适合系统的规模和挑战<br>3、概念验证系统，解决特定的技术风险<br>4、能够发展为生产程序的骨架系统</td>
+</tr>
+<tr>
+<td>程序包实现</td>
+<td>1、向关键利益相关者演进，以获得补充意见<br>2、基于场景的评估，确保架构适合提出的产品和部署<br>3、概念验证部署，测试关于产品和计划部署的假设</td>
+</tr>
+<tr>
+<td>对小型现存系统的评估</td>
+<td>1、TARA 风格的轻量级架构评估</td>
+</tr>
+<tr>
+<td>对大型现存系统的评估</td>
+<td>1、基于场景的评估，以评价系统现存架构对其现在和将来必须面对的关键场景是否适合</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/04/rjjggc/" rel="bookmark">软件架构过程(上)</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/05/04/rjjggc2/" title="软件架构过程（下）">https://tech-insq.github.io/2019/05/04/rjjggc2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84-%E5%8E%9F%E5%88%99/" rel="tag"><i class="fa fa-tag"></i> 架构 - 原则</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/05/04/rjjggc/" rel="prev" title="软件架构过程(上)">
+                  <i class="fa fa-chevron-left"></i> 软件架构过程(上)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/05/04/jgmsmb/" rel="next" title="架构描述内容模版">
+                  架构描述内容模版 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="序 前面的系列文章描述了如何做架构定义，架构可以从横向视图（视点）描述，但是对有些&quot;跨界”的架构属性，横向手法比较难定义。在现实世界中，我们面对各个视图，必须从某一个“视角”去贯穿审视，才能发现整个世界的某些特性或者问题。 当然现实世界中，视角众多，但是并不是每个视角都可以看出这个世界的特性或者问题。视角，应该选择一些关键性的视角。 架构定义，从某一种角度来说：用另一种语义来描述世界，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用视角看架构（上）">
+<meta property="og:url" content="https://tech-insq.github.io/2019/05/18/sjkjg/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="序 前面的系列文章描述了如何做架构定义，架构可以从横向视图（视点）描述，但是对有些&quot;跨界”的架构属性，横向手法比较难定义。在现实世界中，我们面对各个视图，必须从某一个“视角”去贯穿审视，才能发现整个世界的某些特性或者问题。 当然现实世界中，视角众多，但是并不是每个视角都可以看出这个世界的特性或者问题。视角，应该选择一些关键性的视角。 架构定义，从某一种角度来说：用另一种语义来描述世界，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-05-17T23:36:25.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:14:45.943Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构 - 原则 - 视图">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/05/18/sjkjg/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/05/18/sjkjg/","path":"2019/05/18/sjkjg/","title":"用视角看架构（上）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>用视角看架构（上） | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text"> 序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7%E8%A7%86%E8%A7%92"><span class="nav-number">2.</span> <span class="nav-text"> 安全性视角</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text"> 概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E7%82%B9"><span class="nav-number">2.2.</span> <span class="nav-text"> 关注点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B4%BB%E5%8A%A8"><span class="nav-number">2.3.</span> <span class="nav-text"> 活动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E7%AD%96%E7%95%A5"><span class="nav-number">2.4.</span> <span class="nav-text"> 架构策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E8%AF%86%E5%88%AB%E5%87%BA%E7%9A%84%E5%AE%89%E5%85%A8%E5%8E%9F%E5%88%99"><span class="nav-number">2.4.1.</span> <span class="nav-text"> 应用识别出的安全原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%96%E7%95%A5"><span class="nav-number">2.4.2.</span> <span class="nav-text"> 策略</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%92%8C%E5%8F%AF%E4%BC%B8%E7%BC%A9%E6%80%A7%E8%A7%86%E8%A7%92"><span class="nav-number">3.</span> <span class="nav-text"> 性能和可伸缩性视角</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E7%82%B9-2"><span class="nav-number">3.1.</span> <span class="nav-text"> 关注点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B4%BB%E5%8A%A8-2"><span class="nav-number">3.2.</span> <span class="nav-text"> 活动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E7%AD%96%E7%95%A5-2"><span class="nav-number">3.3.</span> <span class="nav-text"> 架构策略</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/05/18/sjkjg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用视角看架构（上）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-05-18 07:36:25" itemprop="dateCreated datePublished" datetime="2019-05-18T07:36:25+08:00">2019-05-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:14:45" itemprop="dateModified" datetime="2021-11-30T22:14:45+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="序"><a class="markdownIt-Anchor" href="#序"></a> 序</h1>
+<p>前面的系列文章描述了如何做架构定义，架构可以从横向视图（视点）描述，但是对有些&quot;跨界”的架构属性，横向手法比较难定义。在现实世界中，我们面对各个视图，必须从某一个“视角”去贯穿审视，才能发现整个世界的某些特性或者问题。</p>
+<p>当然现实世界中，视角众多，但是并不是每个视角都可以看出这个世界的特性或者问题。视角，应该选择一些关键性的视角。 架构定义，从某一种角度来说：用另一种语义来描述世界，可以借鉴我们看世界的视角方法。</p>
+<p>那么架构定义，有哪些关键视角？</p>
+<span id="more"></span>
+<p>架构定义的视角：</p>
+<ul>
+<li>安全性</li>
+<li>性能和可伸缩性</li>
+<li>可用性和弹性</li>
+<li>演进性</li>
+<li>可访问性</li>
+<li>开发资源</li>
+<li>国际化</li>
+<li>位置</li>
+<li>法规</li>
+<li>易用性。</li>
+</ul>
+<p>用以前在华为学到的经验——“DFX”，及“X”视角：</p>
+<ul>
+<li>DFR（Design for Reliability） 可靠性</li>
+<li>DFPF（Design for Performance） 性能</li>
+<li>DFS （Design for Serviceability）可服务性</li>
+<li>DFEE （Design for Energy and Environmental）能效与环境</li>
+<li>DFNS （Design for Network Security）网络安全</li>
+<li>DFC （Design for Compatibility ）兼容性</li>
+<li>DFP (Design for Procurement ) 可采购</li>
+<li>DFSC (Design for Supply Chain) 可供应性</li>
+<li>DFT (Design for Testablility) 可测试</li>
+<li>DFEV (Design for Evolution) 演进</li>
+</ul>
+<p>DFC、DFP、DFSC 偏向硬件（产品）公司的架构，这三个属性是市场视角，而且有时往往是战略性的视角。</p>
+<p>大家联系到最近两年中美贸易摩擦，面对美国的制裁，中兴和华为不同的表现，就可以看出战略性的视角是多重要。当然，很多时候，我们做架构定义可能很少考虑到这种情况，毕竟很多公司很少成长成像华为拥有这样的规模和影响力。</p>
+<p>DFX，X视角的倾向不同：</p>
+<table>
+<thead>
+<tr>
+<th>倾向</th>
+<th>视角</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>产品演进属性</td>
+<td>DFEV</td>
+</tr>
+<tr>
+<td>产品交付属性</td>
+<td>DFP、DFSC、DFC</td>
+</tr>
+<tr>
+<td>产品运行属性</td>
+<td>DFR、DFPF、DFS、DFEE、DFNS。（DFR与DFS 要去DFT）<br>最近热门话题（混沌工程，基于DFT的可靠性工程）</td>
+</tr>
+</tbody>
+</table>
+<h1 id="安全性视角"><a class="markdownIt-Anchor" href="#安全性视角"></a> 安全性视角</h1>
+<h2 id="概念"><a class="markdownIt-Anchor" href="#概念"></a> 概念</h2>
+<table>
+<thead>
+<tr>
+<th>所需品质</th>
+<th>系统可靠地控制、监控、审计 <strong>谁</strong>能够在哪种资源上执行哪种动作<br>的能力，以及检测安全漏洞，并从中恢复的能力。</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>适用性</td>
+<td>所有具备可访问界面的系统，有多位很<strong>重要标识符</strong>的用户的系统，或者需要对操作<br>和信息的访问做出控制的系统。</td>
+</tr>
+<tr>
+<td>关注点</td>
+<td>资源、原则、策略、威胁、机密性、完整性、可用性、可说明性（清晰监控）、<br>检测和恢复、安全机制。</td>
+</tr>
+<tr>
+<td>活动</td>
+<td>识别敏感资源、识别对系统的威胁、定义安全策略、设计安全实现、评估安全风险。</td>
+</tr>
+<tr>
+<td>架构策略</td>
+<td>应用认证的安全原则、验证原则、授权访问、确保信息的保密、确保信息完整性、<br>确保可说明性、保护可用性、整合安全技术、提供安全性管理，<br>使用第三方安全性基础架构。</td>
+</tr>
+<tr>
+<td>问题和缺陷</td>
+<td>复杂的安全策略，未经验证的安全技术，没有针对故障设计的系统，缺少管理工具<br>，技术驱动的方法，没有考虑事件资源，过于依赖技术，不清晰的需求和模型，把<br>安全性作为事后的想法，忽略内部的威胁，假设客户端安全，嵌入在应用程序代码中<br>的安全性，零散的安全，临时的安全策略。</td>
+</tr>
+</tbody>
+</table>
+<p>安全性是一系列过程和技术，让资源所有者能够可靠地控制资源访问权，其涉及：当事人、动作、资源。</p>
+<pre class="mermaid">graph LR
+Actor -.-> 机制
+机制  -.-> 策略
+策略  -.-> 资源</pre>
+<h2 id="关注点"><a class="markdownIt-Anchor" href="#关注点"></a> 关注点</h2>
+<ul>
+<li>
+<p>机密性： 机密性定义为限制一些秘密只开放给有权限的人员访问。</p>
+</li>
+<li>
+<p>完整性：完整性是要确保信息不会在检测不到的情况下发生改变，从而确定信息只会由授权的当事人来创建和改变而并未被篡改。一般采用：以加密的形式对数据&quot;签名&quot;，数据和加密签名具有比较性，从而证实未授权的组织没有改变数据。</p>
+</li>
+<li>
+<p>可用性：同时是运维上的考虑，但实际上跟安全性有关。</p>
+</li>
+<li>
+<p>可说明性：确保每个动作都能过清晰地跟踪到执行的当事人。在集中到系统中，一般通过审计。在分布式系统设计，一般用加密的消息签名来证明消息来自于特定的当事人（不可否认性）。</p>
+</li>
+<li>
+<p>检测和恢复：系统安全性永远不会完美，所以从兜底的角度来看，应该具有检测安全威胁，并从中恢复过来。</p>
+</li>
+<li>
+<p>安全机制： 安全机制是执行安全策略确定规则所需的技术、配置选项以及过程，它会提供系统所需的机密性、完整性、可说明性、可用性的保证。常用的安全技术：用户名和密码、OTP、单点登录系统、私有网络、数据库访问权限控制（数据库操作限制）、SSL\TLS。</p>
+</li>
+</ul>
+<p><strong>常见的安全机制：</strong></p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>验证、授权、审计</td>
+<td>确定当事人、为其授权，并监控对这些权限的使用，<br>从而实现有效的访问控制。</td>
+</tr>
+<tr>
+<td>信息私有性和完整性<br>机制</td>
+<td>它使用加密来<strong>防止</strong>被未经授权的组织访问，并可以检测对消息<br>对篡改。</td>
+</tr>
+<tr>
+<td>系统可用性机制</td>
+<td>恶意攻击的可用性</td>
+</tr>
+<tr>
+<td>安全监控机制</td>
+<td>入侵检测，风险监测，兜底策略。</td>
+</tr>
+<tr>
+<td>数据安全机制</td>
+<td>数据安全、可靠存储。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="活动"><a class="markdownIt-Anchor" href="#活动"></a> 活动</h2>
+<pre class="mermaid">graph LR
+ start --> 确定敏感资源
+ 确定敏感资源 --> 定义安全策略
+ 定义安全策略 --> 识别威胁
+ 识别威胁 --> 设计安全实现
+ 设计安全实现 --> C{评估安全风险}
+ C{评估安全风险} -->|不可接受| 识别威胁
+ C{评估安全风险} -->|可接受|实施</pre>
+<p><strong>确定敏感资源</strong></p>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>敏感度</th>
+<th>所有者</th>
+<th>访问控制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>客户账户记录</td>
+<td>要防止个人信息被盗或者隐私被侵犯</td>
+<td>客户服务组</td>
+<td>没有直接的数据访问</td>
+</tr>
+</tbody>
+</table>
+<p><strong>确定安全策略</strong></p>
+<p>信任模型，信任模型可用一个矩阵图了描述</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>用户类别A</th>
+<th>用户类别B</th>
+<th>用户人员C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>资源类别1</td>
+<td>访问控制集</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>资源类别2</td>
+<td></td>
+<td>访问控制集</td>
+<td></td>
+</tr>
+<tr>
+<td>资源类别3</td>
+<td></td>
+<td></td>
+<td>访问控制集</td>
+</tr>
+</tbody>
+</table>
+<p><strong>活动</strong></p>
+<ul>
+<li>识别用户类别</li>
+<li>识别资源类别</li>
+<li>识别访问控制集</li>
+<li>识别敏感系统操作</li>
+<li>识别完整性需求</li>
+</ul>
+<p><strong>识别威胁模型</strong></p>
+<p>识别威胁模型，一般可用利益的角度了描述： <strong>谁</strong> 通过什么<strong>途径</strong>，付出了多少<strong>成本</strong>，侵害了<strong>谁</strong>的利益，获得了多少<strong>好处</strong>，<strong>受害者</strong>的反应是否<strong>强烈</strong>，<strong>服务提供方</strong>的损失是否大。 这样识别攻击者的动机是否强烈，同时识别该攻击的影响是否大。</p>
+<p><strong>设计安全性实现</strong></p>
+<ul>
+<li>设计缓解威胁的方式</li>
+<li>设计检测和恢复方法</li>
+</ul>
+<p><strong>评估安全风险</strong></p>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>估计成本/美元</th>
+<th>估计难度</th>
+<th>估计可能性</th>
+<th>理论上成本/美元</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="架构策略"><a class="markdownIt-Anchor" href="#架构策略"></a> 架构策略</h2>
+<h3 id="应用识别出的安全原则"><a class="markdownIt-Anchor" href="#应用识别出的安全原则"></a> 应用识别出的安全原则</h3>
+<ul>
+<li>尽可能赋予最少量的权限</li>
+<li>保证最弱环节的安全性</li>
+<li>深度防御</li>
+<li>分离和划分</li>
+<li>保持安全设计简单</li>
+<li>不要依赖于隐晦</li>
+<li>使用安全默认值</li>
+<li>安全地出现故障</li>
+<li>假设外部实体不受信任</li>
+<li>审计敏感事件</li>
+</ul>
+<h3 id="策略"><a class="markdownIt-Anchor" href="#策略"></a> 策略</h3>
+<ul>
+<li>对用户进行身份验证</li>
+<li>授权访问</li>
+<li>确保信息保密性</li>
+<li>确保信息对完整性</li>
+<li>确保可负责性（消息的审计和不可依赖性）</li>
+<li>保护可用性（DOS攻击、DDOS攻击）</li>
+<li>整合安全性技术</li>
+<li>提供安全性管理</li>
+<li>使用第三方的安全性基础架构</li>
+</ul>
+<h1 id="性能和可伸缩性视角"><a class="markdownIt-Anchor" href="#性能和可伸缩性视角"></a> 性能和可伸缩性视角</h1>
+<table>
+<thead>
+<tr>
+<th>期望品质</th>
+<th>系统在其指定的性能状况下可预测地执行，以及在将来需要时<br>处理日益增长的处理量的能力。</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>适用性</td>
+<td>所有性能需求复杂、不清晰或者模糊的系统。</td>
+</tr>
+<tr>
+<td>关注点</td>
+<td>响应时间、吞吐量、可伸缩性、可预测性、硬件资源需求以及峰值负载的行为。</td>
+</tr>
+<tr>
+<td>活动</td>
+<td>获取性能需求，创建性能模型，分析性能模型，执行使用的测试，<br>根据需求进行评估，修订架构</td>
+</tr>
+<tr>
+<td>架构策略</td>
+<td>优化重复的处理，通过复制减少竞争（COW），排定处理的优先级，加强相关<br>的负载，随时间分发处理，最小化共享资源的使用，复用资源和结果，分区和并行<br>，垂直扩展和水平扩展，舒缓降级，使用异步处理，减轻事务的一致性，做出设计妥协。</td>
+</tr>
+<tr>
+<td>问题和缺陷</td>
+<td>不够精确的性能和可伸缩性目标，不切实际的模型，对复杂的情况使用简单的<br>度量，不合适的分区，不合理的环境和平台假设，太多的间接调用，与并发相关<br>的竞争，数据库竞争，事务过载，粗心地分配资源，忽略网络和线程内调用的区别</td>
+</tr>
+</tbody>
+</table>
+<h2 id="关注点-2"><a class="markdownIt-Anchor" href="#关注点-2"></a> 关注点</h2>
+<ul>
+<li>响应时间：响应能力（有多快响应）和回转时间（完成更大型任务所需要的时间）。</li>
+<li>吞吐量：定义在单元时间内系统能够处理的工作负载的量。在大多数系统中，吞吐量和响应时间有着复杂的关系。</li>
+<li>可伸缩性：通过伸缩解决系统过载的能力。</li>
+<li>可预测性：可预测地执行。</li>
+<li>硬件资源需求：满足特定响应时间、吞吐量、可伸缩性的硬件规格。</li>
+<li>峰值负载行为</li>
+</ul>
+<h2 id="活动-2"><a class="markdownIt-Anchor" href="#活动-2"></a> 活动</h2>
+<pre class="mermaid">graph LR
+  1.捕获性能需求 --> 2.创建性能模型
+  2.创建性能模型 --> 3.分析性能模型和实际测试
+  3.分析性能模型和实际测试 --> C{4.根据需求评估}
+  C{4.根据需求评估} -->|可接受|结束
+  C{4.根据需求评估} -->|拒绝|3.分析性能模型和实际测试</pre>
+<h2 id="架构策略-2"><a class="markdownIt-Anchor" href="#架构策略-2"></a> 架构策略</h2>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>优化重复的处理</td>
+<td>根据2/8原则，优化80%执行的20%的代码。<br><strong>操作总成本</strong>=操作调用的成本*调用频率<br><strong>系统负载</strong> = 所有操作总成本<br>从经济的角度来评估操作成本</td>
+</tr>
+<tr>
+<td>通过复制减少竞争</td>
+<td>COW 、CAS</td>
+</tr>
+<tr>
+<td>对处理安优先级排序</td>
+<td>1、对处理进行优先级安排<br>2、对低优先级的处理限速、异步、降级、熔断。</td>
+</tr>
+<tr>
+<td>合并相关的工作</td>
+<td>合并操作，减少&quot;跨系统“的调用开销。</td>
+</tr>
+<tr>
+<td>随时间分发处理</td>
+<td>平均处理的峰谷</td>
+</tr>
+<tr>
+<td>最小化对共享资源的使用</td>
+<td>1、使用硬件多路传输之类的技术来消除架构中的硬件热点。<br>2、在可能的情况下，优先使用短小、简单的事务。<br>3、不要在人工操作时间锁定资源。<br>4、尝试以非独占地方式访问共享资源。</td>
+</tr>
+<tr>
+<td>复用资源和结果</td>
+<td>1、采用某种意义上的&quot;缓存” 复用昂贵的结果。</td>
+</tr>
+<tr>
+<td>分解和并行化</td>
+<td>1、任务分治、拆解独立的并且任务，再合并。</td>
+</tr>
+<tr>
+<td>增强或扩展</td>
+<td>1、Scaling up<br>2、Scaling out<br>3、X（水平）.Y（业务拆分）.Z（客户数据特性拆分）</td>
+</tr>
+<tr>
+<td>舒缓降级</td>
+<td>兜底策略，监控系统服务能力，预测降级条件、隔离策略</td>
+</tr>
+<tr>
+<td>使用异步处理</td>
+<td>1、利用某种形式的队列进行异步处理<br>2、以推或者拉的方式通知处理结果，或者无返回</td>
+</tr>
+<tr>
+<td>放松事务的一致性</td>
+<td>1、BASE<br>2、拆分事务（Saga机制）</td>
+</tr>
+<tr>
+<td>妥协设计</td>
+<td>根据目标、优先级、权衡，进行哲学性的妥协设计。<br>1: 转移到更紧耦合的、整体的设计，从而最小化内部通信延迟和竞争。<br>2：把数据模型的一部分非范式化，比如数据库冗余字段，优化数据的<br>访问。<br>3: 在分布式系统元素之间使用非常粗粒度的操作。<br>4：弱事务一致性，从而进行分区和异步处理。<br>5：本地缓存（复制数据）</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/26/sjkjg2/" rel="bookmark">用视角看架构（下）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/08/ystkjg2/" rel="bookmark">视图方法架构描述（下）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/08/ystkjg/" rel="bookmark">视图方法架构描述（上）</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/05/18/sjkjg/" title="用视角看架构（上）">https://tech-insq.github.io/2019/05/18/sjkjg/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84-%E5%8E%9F%E5%88%99-%E8%A7%86%E5%9B%BE/" rel="tag"><i class="fa fa-tag"></i> 架构 - 原则 - 视图</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/05/08/ystkjg2/" rel="prev" title="视图方法架构描述（下）">
+                  <i class="fa fa-chevron-left"></i> 视图方法架构描述（下）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/05/26/sjkjg2/" rel="next" title="用视角看架构（下）">
+                  用视角看架构（下） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

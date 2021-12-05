@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="为什么 ？  技术框架采用比较老的框架，项目不是基于Maven，依赖管理复杂。 基于JFinal 框架，接口&amp;参数定义不清晰。 代码多人经手，结构混乱，可维护性差。开发该系统的人，基本上都离职光，导致目前团队内没有一个人对该系统的代码熟悉。 可测性不强（大部分功能，无法通过Mock 第三方接口来充分测试，尤其是异常流程测试）。 无资损熔断机制（目前对于能力有缺陷的通道没有基于对方业务不可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="支付银行网关重构设计">
+<meta property="og:url" content="https://tech-insq.github.io/2019/04/14/yhwgcgsl/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="为什么 ？  技术框架采用比较老的框架，项目不是基于Maven，依赖管理复杂。 基于JFinal 框架，接口&amp;参数定义不清晰。 代码多人经手，结构混乱，可维护性差。开发该系统的人，基本上都离职光，导致目前团队内没有一个人对该系统的代码熟悉。 可测性不强（大部分功能，无法通过Mock 第三方接口来充分测试，尤其是异常流程测试）。 无资损熔断机制（目前对于能力有缺陷的通道没有基于对方业务不可">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2019/04/14/yhwgcgsl/bgwxtjg.png">
+<meta property="article:published_time" content="2019-04-14T00:02:07.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:17:18.128Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="设计">
+<meta property="article:tag" content="支付">
+<meta property="article:tag" content="重构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2019/04/14/yhwgcgsl/bgwxtjg.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/04/14/yhwgcgsl/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/04/14/yhwgcgsl/","path":"2019/04/14/yhwgcgsl/","title":"支付银行网关重构设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>支付银行网关重构设计 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text"> 为什么 ？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E7%9B%AE%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text"> 重构目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A3%8E%E9%99%A9%E4%B8%8E%E5%AF%B9%E7%AD%96"><span class="nav-number">3.</span> <span class="nav-text"> 风险与对策</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E8%AE%BA"><span class="nav-number">4.</span> <span class="nav-text"> 方法论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7"><span class="nav-number">5.</span> <span class="nav-text"> 工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1"><span class="nav-number">6.</span> <span class="nav-text"> 设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84"><span class="nav-number">6.1.</span> <span class="nav-text"> 系统架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E5%8A%9B%E8%A7%86%E5%9B%BE"><span class="nav-number">6.2.</span> <span class="nav-text"> 动力视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E8%A1%A5%E5%81%BF%E7%AD%96%E7%95%A5"><span class="nav-number">6.3.</span> <span class="nav-text"> 事务补偿策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%9C%E5%BA%95"><span class="nav-number">6.4.</span> <span class="nav-text"> 兜底</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%8D%9F%E6%8E%A7%E5%88%B6%E7%AD%96%E7%95%A5"><span class="nav-number">6.5.</span> <span class="nav-text"> 资损控制策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E6%BB%91%E5%8D%87%E7%BA%A7%E7%81%B0%E5%BA%A6"><span class="nav-number">7.</span> <span class="nav-text"> 平滑升级（灰度）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E4%BC%98%E7%82%B9"><span class="nav-number">8.</span> <span class="nav-text"> 架构优点</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/04/14/yhwgcgsl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          支付银行网关重构设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-14 08:02:07" itemprop="dateCreated datePublished" datetime="2019-04-14T08:02:07+08:00">2019-04-14</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:17:18" itemprop="dateModified" datetime="2021-11-30T22:17:18+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="为什么"><a class="markdownIt-Anchor" href="#为什么"></a> 为什么 ？</h2>
+<ul>
+<li>技术框架采用比较老的框架，项目不是基于Maven，依赖管理复杂。</li>
+<li>基于JFinal 框架，接口&amp;参数定义不清晰。</li>
+<li>代码多人经手，结构混乱，可维护性差。开发该系统的人，基本上都离职光，导致目前团队内没有一个人对该系统的代码熟悉。</li>
+<li>可测性不强（大部分功能，无法通过Mock 第三方接口来充分测试，尤其是异常流程测试）。</li>
+<li>无资损熔断机制（目前对于能力有缺陷的通道没有基于对方业务不可用的异常金额熔断机制）。</li>
+<li>日志打印不规范，定位问题麻烦，无法根据日志进行告警设置（所有的日志基本都是INFO），导致出现故障，都是业务方先发现。</li>
+</ul>
+<span id="more"></span>
+<h2 id="重构目标"><a class="markdownIt-Anchor" href="#重构目标"></a> 重构目标</h2>
+<ul>
+<li>采用基于Maven 的项目，统一管理依赖。</li>
+<li>采用成熟流行的Spring Boot，重新抽象，提供统一的门面接口，对业务方屏蔽细节，代码结构清晰，提高可维护性、可扩展性。</li>
+<li>变化与不变分离，防止每次修改污染到其他功能，导致每次上线，都要回归所有的功能，增加测试的工作量。</li>
+<li>适配可测性需求，可以通过Mock 第三方接口进行异常模拟测试。</li>
+<li>规范日志打印，方便问题定位，并做好异常告警买点，能够及时发现异常。</li>
+<li>增加资损熔断</li>
+<li>能够基于业务进行接口级进行灰度。</li>
+</ul>
+<h2 id="风险与对策"><a class="markdownIt-Anchor" href="#风险与对策"></a> 风险与对策</h2>
+<ul>
+<li>重构、改动大、开发时间短（封闭开发12天，投入人力3.5人）</li>
+<li>测试工作量大，测试投入少（投入人力1人，预计测试5天）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>风险点</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>银行对接</td>
+<td>1、不改变给银行提供的IP.<br>2、不改变给银行提供的url<br>3、开发环境Mock 银行接口，达到可测性、充分测试。</td>
+</tr>
+<tr>
+<td>入侵性</td>
+<td>1、对现有系统上下文，实现0入侵，兼容现有的业务接口。<br>2、可以回滚</td>
+</tr>
+<tr>
+<td>平滑升级</td>
+<td>1、新老银行网关可以共存。<br>2、通过新系统，可以路由到老的银行网关，解决根据银行通道进行灰度的问题。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="方法论"><a class="markdownIt-Anchor" href="#方法论"></a> 方法论</h2>
+<ul>
+<li>抽象：共性和个性分离，变化与不变分离。</li>
+<li>职责清晰：基于SOA机制，系统之间依赖于接口，系统之间互相屏蔽细节。</li>
+<li>系统等级化原则：原则上底层是不能直接调用上层接口，从而避免循环关系、等到等级化的原则。</li>
+<li>兜底：从资损的角度来看，系统设计必须存在兜底的策略（控制资损为第一原则）。</li>
+<li>敏捷开发：基于银行通道、接口来进行开发（基于Story），持续交付（解决测试工作量峰值），基于Story提测，避免测试等待、突然忙碌。</li>
+</ul>
+<h2 id="工具"><a class="markdownIt-Anchor" href="#工具"></a> 工具</h2>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mock工具</td>
+<td>1、采用MockKoon<br>2、模拟正常返回<br>3、模拟异常测试（模拟各种Http状态、超时）<br>4、模拟各种业务异常状态</td>
+</tr>
+<tr>
+<td>开发工具</td>
+<td>1、Maven<br>2、Eclipse<br>3、Git(Github)<br>4、Jenkins<br>5、Sonarqube(代码静态扫描)</td>
+</tr>
+<tr>
+<td>技术工具</td>
+<td>1、SpringBoot<br>2、Mybatis<br>3、Redis<br>4、MySQL<br>5、Nginx</td>
+</tr>
+</tbody>
+</table>
+<h2 id="设计"><a class="markdownIt-Anchor" href="#设计"></a> 设计</h2>
+<h3 id="系统架构"><a class="markdownIt-Anchor" href="#系统架构"></a> 系统架构</h3>
+<p><img src="/2019/04/14/yhwgcgsl/bgwxtjg.png" alt></p>
+<p><strong>关键设计点</strong></p>
+<table>
+<thead>
+<tr>
+<th>关键点</th>
+<th>方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>抽象</td>
+<td>1、子系统依赖SOA(RESTFul)接口，对其他子系统的细节透明。<br>2、通过统一的门面，对上游业务提供稳定的接口，通用参数和个性参数。<br>3、Bank-Proxy、Bank-Front 具有统一的抽象模型：Bank。Bank-Proxy 采用代理模式。Bank-Front 采用构建模式、复合模式。</td>
+</tr>
+<tr>
+<td>路由</td>
+<td>1、（业务编码、通道名称、接口）—&gt;Bank-Front—&gt;Bank。<br>2、（业务编码、通道名称、接口、资费）—&gt;Bank-Front—&gt;Bank。<br></td>
+</tr>
+<tr>
+<td>反应堆系统</td>
+<td>1、通过队列、异步维护系统原则（等级化、非循环原则）。<br>2、Timer 采用指数退避机制进行补偿（保证性通知）</td>
+</tr>
+<tr>
+<td>补偿任务</td>
+<td>1、处理确定的终态，对非终态（不确定的状态）采用补偿（或者Pending）<br>2、兜底（阻损策略，控制资金损失为第一原则）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="动力视图"><a class="markdownIt-Anchor" href="#动力视图"></a> 动力视图</h3>
+<p><strong>系统流程图：</strong></p>
+<pre class="mermaid">sequenceDiagram
+     participant Trade
+     participant BankProxy
+     participant BankFront
+     participant Bank
+     participant ReactorGw
+     participant Timer
+     Trade->>BankProxy:Pay Order
+     BankProxy->>BankProxy:幂等性、发现路由、资损控制
+     BankProxy->>BankFront: Pay Order
+     alt Normal
+         BankFront->>Bank:Pay Order
+         Bank->>BankFront: Status
+         BankFront->>BankProxy:Status
+         BankProxy->>Trade:Status
+     else Exception
+         BankFront->>Bank:Pay Order
+         BankFront->BankFront:Exceptions,Unknown state
+         BankFront->>ReactorGw:Timed task
+     end
+     Bank-->>BankFront:Call back
+     BankFront-->>ReactorGw:Notify
+     ReactorGw--x Trade:async notify
+     ReactorGw->ReactorGw: Handle Result
+     alt Fail
+     ReactorGw->ReactorGw:Save timer task
+     end
+     loop Loop task
+     Timer-->Timer:Find task(补偿)
+     Timer-->>BankProxy:Compensation transaction
+     alt Success
+     BankProxy-->>Timer:Final state
+     Timer-->>Trade:async notify
+     else Fail
+     BankProxy-->>Timer:Non-Final state
+     alt Time Out
+     Timer-->>BankProxy:Rollback
+     else Non-Time Out
+     Timer->Timer:Update next time
+     end
+     end
+     end</pre>
+<p><strong>动力视图说明</strong></p>
+<ul>
+<li>简要画出子系统之间的调用。</li>
+<li>Timer：定时任务采用指数退避算法进行重试，到达一定的数次，采用固定的时间去尝试。</li>
+<li>反应堆系统：采用队列、异步调用打破系统循环关系。</li>
+<li>Timer 与BankProxy的调用：BankProxy根据路由关系，路由到相应的BankFront。</li>
+</ul>
+<h3 id="事务补偿策略"><a class="markdownIt-Anchor" href="#事务补偿策略"></a> 事务补偿策略</h3>
+<p><strong>补偿流程图</strong></p>
+<pre class="mermaid">graph LR
+    事务初始化-->|执行原子|初始化
+    初始化-->|执行|成功
+    初始化-->|执行|失败
+    初始化-->|执行|未知
+    成功-->|执行|业务成功
+    业务成功-->事务终止
+    失败-->业务失败
+    业务失败-->回滚
+    回滚-->回滚成功
+    回滚成功-->事务终止
+    回滚-->回滚失败
+    回滚失败-->Pengding告警
+    未知-->|补偿|成功
+    未知-->|补偿|失败</pre>
+<p><strong>关键设计</strong></p>
+<ul>
+<li>状态未知：网络读超时，被调用方返回未知的状态码（该错误码不能说明成功或者失败，对于成功的错误码必须是明确的状态，同时失败的状态码必须）。</li>
+<li>假如成功状态是200，那么失败的状态 禁止：非200的状态，失败的状态，必须列出，比如201，202。其他状态认为非终态，比如203。</li>
+<li>补偿机制：注意幂等性操作，先查询、后补偿（一般是查询对方状态，更新本地状态）。</li>
+<li>通道能力：被依赖的通道具备查询接口，则进行指数退避补偿。被依赖的通道不具备查询接口，则进行资损熔断。</li>
+</ul>
+<h3 id="兜底"><a class="markdownIt-Anchor" href="#兜底"></a> 兜底</h3>
+<p>做最坏的打算，系统设计总会有不尽人意的地方，所以必须做最坏的打算。 系统设计如此，人生亦如此。</p>
+<p><strong>正确认识成功或者失败</strong></p>
+<ul>
+<li>区分业务上的成功 和业务上的失败。</li>
+<li>内部失败：比如写数据库失败。</li>
+<li>如果是业务成功 + 内部失败，则可以返回调用方业务成功或者Pengding。</li>
+<li>如果业务失败，则返回调用方业务失败。</li>
+</ul>
+<p><strong>一个血的案例</strong></p>
+<ul>
+<li>这个例子 由于没有正确识别业务成功 和内部失败，导致资金损失。</li>
+</ul>
+<p><strong>血案产生的流程：</strong></p>
+<pre class="mermaid">sequenceDiagram
+  Actor-->>Trade:提现
+  Trade-->>BGW:提现
+  BGW-->>Bank:提现
+  Bank-->>Bank:增加用户账户余额
+  Bank-->>BGW:成功
+  Bank-->>用户:银行账户收到xx金额
+  BGW-->>BGW:写DB失败
+  BGW-->>Trade:失败
+  Trade-->>Trade:回滚账户余额
+  用户-->>用户:看到账户余额没有变少
+  用户-->>Actor:提现</pre>
+<h3 id="资损控制策略"><a class="markdownIt-Anchor" href="#资损控制策略"></a> 资损控制策略</h3>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>策略</th>
+<th>动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>银行通道能力有缺陷</td>
+<td>1、日常异常金额&gt;= X 告警<br>2、日累积异常金额&gt;=Y，通道暂时不可用，并告警</td>
+<td>1、接收告警，要第一时间联系银行。<br>2、提供手工清除不可用标识</td>
+</tr>
+<tr>
+<td>银行能力完备</td>
+<td>走完整的事务补偿流程</td>
+<td></td>
+</tr>
+<tr>
+<td>自动退款</td>
+<td>1、自动退款日累积金额，超过日常金额，转手工确认。<br>2、单笔最大超过xx，转手工确认退款</td>
+<td>防止自动退款由于某个异常，造成损失。</td>
+</tr>
+<tr>
+<td>手工退款</td>
+<td>1、提供异常订单查询系统<br>2、提供手工退款功能</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="平滑升级灰度"><a class="markdownIt-Anchor" href="#平滑升级灰度"></a> 平滑升级（灰度）</h2>
+<p><strong>通过BankProxy 灰度</strong></p>
+<ul>
+<li>通过Proxy 基于银行通道的灰度</li>
+</ul>
+<pre class="mermaid">graph TD
+Trade-->Nginx
+Nginx-->Bank.Proxy
+Bank.Proxy-->Old_BGW
+Old_BGW-->A_Bank
+Bank.Proxy-->Bank.Front
+Bank.Front-->B_Bank</pre>
+<p><strong>通过Nginx 灰度</strong></p>
+<pre class="mermaid">graph TD
+Trade-->Nginx
+Nginx-->Old_BGW
+Old_BGW-->A_Bank
+Nginx-->Bank.Proxy
+Bank.Proxy-->Bank.Front
+Bank.Front-->B_Bank</pre>
+<h2 id="架构优点"><a class="markdownIt-Anchor" href="#架构优点"></a> 架构优点</h2>
+<p><strong>变化与不变的分离</strong></p>
+<ul>
+<li>反应堆系统（Reactor）：依赖于抽象，逻辑是稳定的。</li>
+<li>Bank_Proxy：依赖于抽象，是稳定的。</li>
+<li>Bank_Front：是变化的，可以微服务（模块化），对变化的边界是可控的。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/03/23/psxtsj/" rel="bookmark">推送系统设计</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/04/14/yhwgcgsl/" title="支付银行网关重构设计">https://tech-insq.github.io/2019/04/14/yhwgcgsl/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BE%E8%AE%A1/" rel="tag"><i class="fa fa-tag"></i> 设计</a>
+              <a href="/tags/%E6%94%AF%E4%BB%98/" rel="tag"><i class="fa fa-tag"></i> 支付</a>
+              <a href="/tags/%E9%87%8D%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 重构</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/03/23/tjyzl/" rel="prev" title="统计与真理">
+                  <i class="fa fa-chevron-left"></i> 统计与真理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/04/17/ywxtjk/" rel="next" title="业务监控系统设计">
+                  业务监控系统设计 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

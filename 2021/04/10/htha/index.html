@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="诊断架构风险  如上架构示意图，描述高流量场景下的可能技术风险，以及其应对策略。 高流量场景下的技术风险  接入层带宽被耗尽（入口风险）。 大量静态文件读取（I&#x2F;O 风险）。 DB 超负荷，导致业务服务成为瓶颈，引发雪崩效应。 三方依赖问题，导致依赖服务成为瓶颈，引发雪崩效应。 微服务处理线程不够。  那针对入上的技术风险，那么如何应对？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高流量高可用应对策略">
+<meta property="og:url" content="https://tech-insq.github.io/2021/04/10/htha/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="诊断架构风险  如上架构示意图，描述高流量场景下的可能技术风险，以及其应对策略。 高流量场景下的技术风险  接入层带宽被耗尽（入口风险）。 大量静态文件读取（I&#x2F;O 风险）。 DB 超负荷，导致业务服务成为瓶颈，引发雪崩效应。 三方依赖问题，导致依赖服务成为瓶颈，引发雪崩效应。 微服务处理线程不够。  那针对入上的技术风险，那么如何应对？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2021/04/10/htha/htha.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/04/10/htha/jgys.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2021/04/10/htha/fycl.jpg">
+<meta property="article:published_time" content="2021-04-10T03:37:54.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:10:24.317Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2021/04/10/htha/htha.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2021/04/10/htha/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2021/04/10/htha/","path":"2021/04/10/htha/","title":"高流量高可用应对策略"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>高流量高可用应对策略 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8A%E6%96%AD%E6%9E%B6%E6%9E%84%E9%A3%8E%E9%99%A9"><span class="nav-number">1.</span> <span class="nav-text"> 诊断架构风险</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E6%83%B3%E5%8F%8A%E6%89%8B%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text"> 思想及手段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E6%80%9D%E6%83%B3"><span class="nav-number">2.1.</span> <span class="nav-text"> 架构思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E6%89%8B%E6%AE%B5"><span class="nav-number">2.2.</span> <span class="nav-text"> 技术手段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1%E7%AD%96%E7%95%A5"><span class="nav-number">2.3.</span> <span class="nav-text"> 防御策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E6%A0%87%E5%87%86"><span class="nav-number">2.4.</span> <span class="nav-text"> 架构标准</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E5%B7%A1%E6%A3%80"><span class="nav-number">2.5.</span> <span class="nav-text"> 架构巡检</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E6%B2%8C%E5%B7%A5%E7%A8%8B"><span class="nav-number">2.6.</span> <span class="nav-text"> 混沌工程</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/04/10/htha/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          高流量高可用应对策略
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-10 11:37:54" itemprop="dateCreated datePublished" datetime="2021-04-10T11:37:54+08:00">2021-04-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:10:24" itemprop="dateModified" datetime="2021-11-30T22:10:24+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="诊断架构风险"><a class="markdownIt-Anchor" href="#诊断架构风险"></a> 诊断架构风险</h2>
+<img src="/2021/04/10/htha/htha.png" alt="htha" style="zoom:70%;">
+<p>如上架构示意图，描述高流量场景下的可能技术风险，以及其应对策略。</p>
+<p><strong>高流量场景下的技术风险</strong></p>
+<ol>
+<li>接入层带宽被耗尽（入口风险）。</li>
+<li>大量静态文件读取（I/O 风险）。</li>
+<li>DB 超负荷，导致业务服务成为瓶颈，引发雪崩效应。</li>
+<li>三方依赖问题，导致依赖服务成为瓶颈，引发雪崩效应。</li>
+<li>微服务处理线程不够。</li>
+</ol>
+<p>那针对入上的技术风险，那么如何应对？</p>
+<span id="more"></span>
+<h2 id="思想及手段"><a class="markdownIt-Anchor" href="#思想及手段"></a> 思想及手段</h2>
+<h3 id="架构思想"><a class="markdownIt-Anchor" href="#架构思想"></a> 架构思想</h3>
+<blockquote>
+<p><strong>风险驱动、恰如其分，未雨绸缪</strong></p>
+</blockquote>
+<p>风险驱动： 基于当前方案（架构），思考 <strong>如果什么事情发生了，那么要怎么做？</strong></p>
+<p>恰如其分： 罗列的风险可能很多，但是基于<strong>客观情况、价值、底线</strong>，做出适当的决策（比如DID原则），同时保留演进的可能性。</p>
+<p>未雨绸缪： 风险的出现是基于概率，但是随着业务的发展，小概率事件会成为大概率事件，那么需要采用相应的技术手段进行应对：架构巡检、治理，混沌工程，架构标准（面对风险的服务标准），兜底策略。</p>
+<p>那如何基于该思想进行 ？</p>
+<h3 id="技术手段"><a class="markdownIt-Anchor" href="#技术手段"></a> 技术手段</h3>
+<p>根据上述的架构思想，我们从系统上下文的架构元素，描述常见的技术手段：</p>
+<img src="/2021/04/10/htha/jgys.jpg" alt="jgys" style="zoom:50%;">
+<p>上图只是从架构元素来描述高流量下的高可用手段，但是从架构链路来看，如何处理慢的链路呢？常见的处理方案是快慢隔离。快慢隔离的做法是从资源、服务上将慢接口隔离出去，避免慢接口影响快接口（比如耗尽服务线程），但是分布式架构，其链路依赖比较复杂，再加上技术实践的问题，导致快慢隔离的效果也是有限的，比如快接口和慢接口共用资源，那么如果在对资源的访问上没有隔离，快慢隔离的效果就仅仅是防止慢接口耗尽服务线程，避免快接口没有服务线程进行响应。 在这种情况下，除了快慢隔离，还要进行慢接口限流。 当然解决一个架构技术问题，不单单只是一把锤子就可以解决得了。针对不同场景下，我们可能需要如下的技术手段：</p>
+<ol>
+<li>​     读写分离，避免有些慢查询服务 耗尽资源。</li>
+<li>​     反应式（事件驱动、异步、全链路异步【需要一整套的解决方案，只能在某些场景下全链路异步】），避免服务线程被耗尽。其实施方案需要响应式 REST 框架、RPC框架、Http 客户端、消  息队列，这些技术组件不必全部要，比如响应式RPC框架，目前的微服务框架支撑不是很好。只能适当的组合解决某些技术问题。</li>
+<li>CQRS架构： 将查询和业务接口隔离。</li>
+<li>降级：  业务降级，必须针对特定的场景，进行特定的解决。</li>
+</ol>
+<h3 id="防御策略"><a class="markdownIt-Anchor" href="#防御策略"></a> 防御策略</h3>
+<p>针对有些不可降级的调用、场景，并且没有较好的应对方案，那么必须有相应的兜底策略。 或者有些场景、其调用随着业务的增长和时间的积累，必然会有技术风险，但是本着恰如其分的原则，目前却没有很大的动力去解决该风险，那么必须有未雨绸缪的策略。</p>
+<p>总之防御策略体现 未雨绸缪的架构思想。</p>
+<img src="/2021/04/10/htha/fycl.jpg" alt="fycl" style="zoom:50%;">
+<h3 id="架构标准"><a class="markdownIt-Anchor" href="#架构标准"></a> 架构标准</h3>
+<p>架构标准，是指一些必须实施的技术标准，从未雨绸缪的角度，当系统出现技术风险的时候，可以进行响应，从而确保系统的高可用、鲁棒性、快速恢复。如下的标准，只是一些例子：</p>
+<table>
+<thead>
+<tr>
+<th>标准</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MySQL 慢查询告警</td>
+<td>基于目前的硬件能力和性能预告，对MySQL 查询接口进行 慢告警。比如超时&gt;=100 ms。</td>
+</tr>
+<tr>
+<td>服务监控告警</td>
+<td>1、流量激增告警，比如请求量超过2倍进行告警。<br>2、平均耗时1.5 倍告警，当速度慢下来的时候，而且比较明显，反应着请求量在涨。<br>3、成功率 &lt;= 95%</td>
+</tr>
+<tr>
+<td>接入层限流</td>
+<td>以高峰的10倍，对预估可能成为瓶颈的接口进行限流，并按周期性巡检（月度）</td>
+</tr>
+<tr>
+<td>业务网关快慢隔离</td>
+<td>将网关层慢接口（数据上报接口）隔离到固定的集群中去。</td>
+</tr>
+<tr>
+<td>请求队列标准</td>
+<td>1、将网关层请求队列长度 设置 100。<br>2、将RPC框架的请求队列长度 设置为100。<br>3、如果框架具备能够丢失大量的无效请求（在客户端已经超时），则可以不设置，但要启用该功能。</td>
+</tr>
+<tr>
+<td>RPC线程</td>
+<td>1、RPC线程 200～300。<br>2、单接口线程 100（隔离）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="架构巡检"><a class="markdownIt-Anchor" href="#架构巡检"></a> 架构巡检</h3>
+<p>周期性对系统进行巡检：</p>
+<ol>
+<li>高峰流量：统计预估、限流标准。</li>
+<li>数据量：比如MySQL 单表数据量，进行分库分表决策。</li>
+<li>请求量/耗时：对请求量/接口耗时进行巡检，进行接口优化决策（缓存、异步、调整用户体验）。</li>
+<li>可观测： 对系统的属性进行可观测巡检，对于不可观察的关键点，则要进行监控埋点/上报。</li>
+</ol>
+<h3 id="混沌工程"><a class="markdownIt-Anchor" href="#混沌工程"></a> 混沌工程</h3>
+<p>混沌工程的作用：</p>
+<ol>
+<li>定义系统稳态的观测度量。</li>
+<li>架构标准实施，注入验收，增强可测性。</li>
+<li>自动架构巡检的手段。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/11/15/apigw/" rel="bookmark">API 网关设计</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/09/01/cxyznqy/" rel="bookmark">前言</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/05/22/jgyz/" rel="bookmark">架构原则</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/04/10/fkztzj/" rel="bookmark">风控中台建设总结</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/04/jgmsmb/" rel="bookmark">架构描述内容模版</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2021/04/10/htha/" title="高流量高可用应对策略">https://tech-insq.github.io/2021/04/10/htha/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 架构</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/05/26/sjkjg2/" rel="prev" title="用视角看架构（下）">
+                  <i class="fa fa-chevron-left"></i> 用视角看架构（下）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/04/10/fkztzj/" rel="next" title="风控中台建设总结">
+                  风控中台建设总结 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

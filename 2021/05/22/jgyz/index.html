@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="为什么 ​      架构设计为什么需要遵循一定的原则呢？在软件设计、研发、运行中，我们总会遇到如下的问题：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="架构原则">
+<meta property="og:url" content="https://tech-insq.github.io/2021/05/22/jgyz/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="为什么 ​      架构设计为什么需要遵循一定的原则呢？在软件设计、研发、运行中，我们总会遇到如下的问题：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2021/05/22/jgyz/fz.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/05/22/jgyz/djh.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/05/22/jgyz/fc.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/05/22/jgyz/gxys.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/05/22/jgyz/fl.png">
+<meta property="article:published_time" content="2021-05-22T13:16:53.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:11:30.537Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="方法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2021/05/22/jgyz/fz.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2021/05/22/jgyz/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2021/05/22/jgyz/","path":"2021/05/22/jgyz/","title":"架构原则"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>架构原则 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text"> 为什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%81%9A"><span class="nav-number">2.</span> <span class="nav-text"> 如何做</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E6%AD%A3%E4%BA%A4%E6%80%A7u"><span class="nav-number">2.1.</span> <span class="nav-text"> 正交性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%A6%A5%E9%80%82%E6%80%A7u"><span class="nav-number">2.2.</span> <span class="nav-text"> 妥适性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E6%99%AE%E9%81%8D%E6%80%A7u"><span class="nav-number">2.3.</span> <span class="nav-text"> 普遍性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%88%86%E6%B2%BBu"><span class="nav-number">2.4.</span> <span class="nav-text"> 分治</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%88%86%E5%B1%82%E7%AD%89%E7%BA%A7%E5%8C%96u"><span class="nav-number">2.5.</span> <span class="nav-text"> 分层(等级化)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E6%8A%BD%E8%B1%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E5%88%86%E7%A6%BBu"><span class="nav-number">2.6.</span> <span class="nav-text"> 抽象与实现分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E6%8E%A5%E5%8F%A3%E9%9A%94%E7%A6%BBu"><span class="nav-number">2.7.</span> <span class="nav-text"> 接口隔离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E9%AB%98%E5%8F%AF%E7%94%A8u"><span class="nav-number">2.8.</span> <span class="nav-text"> 高可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%80%A7u"><span class="nav-number">2.9.</span> <span class="nav-text"> 可测试性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7u"><span class="nav-number">2.10.</span> <span class="nav-text"> 可观测性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%AE%89%E5%85%A8%E6%80%A7u"><span class="nav-number">2.11.</span> <span class="nav-text"> 安全性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E4%B8%9A%E5%8A%A1%E9%80%82%E5%BA%94%E6%80%A7u"><span class="nav-number">2.12.</span> <span class="nav-text"> 业务适应性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E5%BC%80%E6%94%BE-%E5%B0%81%E9%97%ADu"><span class="nav-number">2.13.</span> <span class="nav-text"> 开放-封闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E7%89%88%E6%9C%AC%E5%8C%96u"><span class="nav-number">2.14.</span> <span class="nav-text"> 版本化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u%E4%B8%80%E8%87%B4%E6%80%A7u"><span class="nav-number">2.15.</span> <span class="nav-text"> 一致性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text"> 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/05/22/jgyz/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          架构原则
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-22 21:16:53" itemprop="dateCreated datePublished" datetime="2021-05-22T21:16:53+08:00">2021-05-22</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:11:30" itemprop="dateModified" datetime="2021-11-30T22:11:30+08:00">2021-11-30</time>
+      </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="为什么"><a class="markdownIt-Anchor" href="#为什么"></a> 为什么</h2>
+<p>​      架构设计为什么需要遵循一定的原则呢？在软件设计、研发、运行中，我们总会遇到如下的问题：</p>
+<span id="more"></span>
+<p><u><strong>代码问题</strong></u></p>
+<ol>
+<li>代码结构臃肿混乱，不利于平时的阅读和维护。</li>
+<li>循环依赖</li>
+<li>对依赖方侵入性的伤害，比如Java 包依赖冲突。</li>
+<li>代码风格与规范问题</li>
+</ol>
+<p><u><strong>版本迭代效率</strong></u></p>
+<ol>
+<li>特性并发开发，分支合并频率高。</li>
+<li>特性开发，修改、测试成本高。</li>
+</ol>
+<p><u><strong>服务测试问题</strong></u></p>
+<ol>
+<li>服务可测试性差</li>
+</ol>
+<p><u><strong>服务运行问题</strong></u></p>
+<ol>
+<li>服务循环依赖</li>
+<li>服务状态不可观测，导致对线上问题不可知。</li>
+<li>故障级联影响</li>
+<li>安全性问题</li>
+</ol>
+<p><u><strong>架构演进问题</strong></u></p>
+<ol>
+<li>架构演进平滑性问题</li>
+</ol>
+<p><u><strong>业务适应性问题</strong></u></p>
+<ol>
+<li>业务增长了，架构调整的频率高，对业务增长适应性能力弱。</li>
+</ol>
+<p><u><strong>架构一致性问题</strong></u></p>
+<ol>
+<li>同类问题的解决方案不一样，比如某领域（上下文界定）的系统，部分接口通过API服务进行访问的，部分接口直接绕过API服务。</li>
+<li>同类的功能分散到不同性质的服务，比如风控中台的内部业务数据源有的是调用接口，有的是直接连MySQL等。</li>
+<li>用户安全问题，在有些用户输入敏感信息等地方用掩码，有些地方没有。</li>
+<li>架构一致性包含：风格一致性（发布-订阅、事务脚本、管道-过滤器，是对架构模式的运用）、解决方案一致性（1、2、3）、形式一致性（比如MVC模式）。</li>
+</ol>
+<h2 id="如何做"><a class="markdownIt-Anchor" href="#如何做"></a> 如何做</h2>
+<p>​     针对上述遇到的问题，如何从架构设计是避免的？ 架构的局限是随着业务的增长、变化，不断演进才体现出来的，具有一定的不确定性。遵循一些简单、朴素的原则，是面对不确定性的好方法。 架构设计建议遵循一些原则：</p>
+<h3 id="u正交性u"><a class="markdownIt-Anchor" href="#u正交性u"></a> <u><strong>正交性</strong></u></h3>
+<p>​    不要将独立的东西耦合起来。正交的功能发生的变化，对系统中的其他功能不应该产生显著影响。 比如风控系统中渠道方数据源变化，不应该影响其他渠道的数据方数据源、贷超的渠道方。正交性原则需要：</p>
+<ol>
+<li>模块化设计</li>
+<li>单一职责</li>
+<li>隔离</li>
+</ol>
+<p>总之需要经过抽象与封装，才能达到基于<strong>单一职责</strong>的<strong>模块化设计</strong>，从而实现<strong>隔离</strong>的目的。</p>
+<h3 id="u妥适性u"><a class="markdownIt-Anchor" href="#u妥适性u"></a> <u><strong>妥适性</strong></u></h3>
+<p>​     不要引入无关的东西，满足必需的功能称为妥适性。妥适性的相对面是无关性。妥适性需要对系统进行<strong>职责划分</strong>，达到<strong>职责清晰</strong>。妥适性需要：</p>
+<ol>
+<li>系统边界划分，做到职责清晰。</li>
+<li>单一职责。</li>
+<li>简单依赖，不建立（引入）无关的依赖。</li>
+</ol>
+<p>简约性也是妥适性的一种考虑，比如&lt;&lt;架构真经&gt;&gt;中的<strong>三次简化设计方案</strong>：</p>
+<ol>
+<li>采用（8-2）原则简化范围。</li>
+<li>考虑成本优化和可扩展性来简化设计。</li>
+<li>依靠其他人的经验来简化部署。</li>
+</ol>
+<h3 id="u普遍性u"><a class="markdownIt-Anchor" href="#u普遍性u"></a> <u><strong>普遍性</strong></u></h3>
+<p>​     不要限制固有的东西，普遍性就是通过某种功能实现众多结果的能力。实现普遍性的最常见方式是开方式的收尾、完整的功能集、分解功能为正交组件以及使用组合技术，是通过对事物的本质认识，进行通用性设计，实现通过外部配置化、组合成新的功能。常见的案例：</p>
+<ol>
+<li>用户实时指标：其他本质是基于 X 业务数据，通过维度F(w1,w2,w3,…)作为唯一特征，基于时间窗口W的统计(统计函数)变量。这里完整的功能集，唯一特征提取函数算子、统计函数算子等正交函数，利用组合技术（外部配置）实现新的用户实时指标。</li>
+<li>业务指标统计：如果基于SQL模式，那么就可以减少很多开发量，不然开发速度追不上数据需求。</li>
+</ol>
+<h3 id="u分治u"><a class="markdownIt-Anchor" href="#u分治u"></a> <u><strong>分治</strong></u></h3>
+<p>​      避免一团大泥球的模式，可以基于不同粒度的，将大系统小做。最常见的实践方法：</p>
+<ol>
+<li>将上下文界定的系统，通过领域模型驱动(DDD)方法，进行领域建模。</li>
+<li>将相应的子领域进行模块化（早期模式）。</li>
+<li>将相应的子领域进行服务化（SOA或微服务）。</li>
+</ol>
+<p>分治的本质是将按领域模型，将业务系统分治成不同的子系统；将系统的层次按接入层、业务聚合层、业务领域层划分成不同的子系统（子模块）。</p>
+<p><img src="/2021/05/22/jgyz/fz.png" alt="fz"></p>
+<h3 id="u分层等级化u"><a class="markdownIt-Anchor" href="#u分层等级化u"></a> <u><strong>分层(等级化)</strong></u></h3>
+<p>在现实中，我们要将服务（模块）等级化与分层，则必须消除循环依赖。我们如何解决非循环依赖，循环依赖造成的影响：</p>
+<ol>
+<li>架构依赖混乱、不清晰（服务不能等级化与分层）。</li>
+<li>系统运行可能，由于某个子系统的问题，导致整个集群业务不可用。</li>
+</ol>
+<p>那<u>如何解决循环依赖</u>呢？</p>
+<ol>
+<li>上移：将导致循环依赖的职责转移到一个较高等的子系统（管理模块）中。</li>
+<li>下移：将导致循环依赖的职责转移到一个较低等的子系统（模块）中。</li>
+<li>异步回调：采用基于观察者模式，消息订阅模式消除循环依赖。</li>
+</ol>
+<p>如何对服务（模块）进行等级化（分层），要遵循以下的指导：</p>
+<ol>
+<li>将外部服务（模块）设置为第0层（级）。</li>
+<li>将只依赖第0层（级）的服务（模块）设置为1层（级）。</li>
+<li>将依赖第1层（级）的服务（模块）设置为2层（级）。</li>
+<li>将依赖第n层（级）的服务（模块）设置为n + 1层（级）。</li>
+</ol>
+<p><img src="/2021/05/22/jgyz/djh.png" alt="djh"></p>
+<p>依据等级化，进行物理分层：</p>
+<p><img src="/2021/05/22/jgyz/fc.png" alt="fc"></p>
+<p><strong>服务（模块）关系不应该违反概念上的分层</strong>：</p>
+<p><img src="/2021/05/22/jgyz/gxys.png" alt="gxys"></p>
+<h3 id="u抽象与实现分离u"><a class="markdownIt-Anchor" href="#u抽象与实现分离u"></a> <u><strong>抽象与实现分离</strong></u></h3>
+<p>将抽象与实现它们的类放在各自独立的模块（项目）中：</p>
+<p>如果依赖抽象体的所有类位于多个服务（模块）中，那么就应该将抽象体放在一个单独的模块（项目）中，这个模块（项目）与依赖抽象体的实现实现了分离。</p>
+<p>比如RPC服务声明的抽象体，建议RPC服务的实现进行分离：</p>
+<ol>
+<li>避免给依赖该服务的服务进行Jar包依赖侵入。</li>
+<li>避免重新产生RPC抽象类，导致实现功能被影响（GRPC）。</li>
+<li>服务多版本化实现。</li>
+</ol>
+<p><img src="/2021/05/22/jgyz/fl.png" alt="fl"></p>
+<h3 id="u接口隔离u"><a class="markdownIt-Anchor" href="#u接口隔离u"></a> <u><strong>接口隔离</strong></u></h3>
+<p>​      众多的接口要优于单一、通用性的接口：</p>
+<ol>
+<li>面向业务功能单一职责的接口。</li>
+<li>避免提供万能接口。</li>
+</ol>
+<h3 id="u高可用u"><a class="markdownIt-Anchor" href="#u高可用u"></a> <u><strong>高可用</strong></u></h3>
+<ol>
+<li>隔离： 快、慢隔离， 数据总线（网关）与业务总线（网关）隔离，渠道隔离，业务系统与产品系统隔离，产品智能与数据库系统隔离。防止级联影响。</li>
+<li>异步化：基于接收-执行-通知的模式。</li>
+<li>熔断与降级：防止雪崩</li>
+<li>防单点故障： 服务发现、无状态服务、多节点部署。</li>
+<li>最终一致性：差错处理、中间态处理。</li>
+<li>分类处理不同的负载：需要隔离</li>
+</ol>
+<h3 id="u可测试性u"><a class="markdownIt-Anchor" href="#u可测试性u"></a> <u><strong>可测试性</strong></u></h3>
+<p>系统是可测试，建议从可测性的角度，进行系统架构设计。</p>
+<h3 id="u可观测性u"><a class="markdownIt-Anchor" href="#u可观测性u"></a> <u><strong>可观测性</strong></u></h3>
+<p>定义系统可观测性指标，进行监控、告警，比如基于四大黄金指标：</p>
+<ol>
+<li>时延（耗时）</li>
+<li>请求量</li>
+<li>成功率</li>
+<li>资源利用率</li>
+</ol>
+<p>跟进一步，进行系统稳态的假设，如何通过定义的指标观测系统是否稳定。</p>
+<h3 id="u安全性u"><a class="markdownIt-Anchor" href="#u安全性u"></a> <u><strong>安全性</strong></u></h3>
+<ol>
+<li>外部接口安全机制：机密机制 + 签名。</li>
+<li>数据安全机制：数据签名机制，敏感数字加密存储。</li>
+<li>物理隔离机制：通过分层的机制，将访问基础IT的服务隔离到外部不可访问的物理机上。</li>
+</ol>
+<h3 id="u业务适应性u"><a class="markdownIt-Anchor" href="#u业务适应性u"></a> <u><strong>业务适应性</strong></u></h3>
+<p>基于未来1～2年的业务发展量，来进行架构设计，比如&lt;&lt;架构真经&gt;&gt;中提到的DID原则：</p>
+<ol>
+<li>D（设计）：设计20倍的容量。</li>
+<li>I（实现）实现3倍的容量。</li>
+<li>D（实施）实施1.5倍的容量。</li>
+</ol>
+<h3 id="u开放-封闭u"><a class="markdownIt-Anchor" href="#u开放-封闭u"></a> <u><strong>开放-封闭</strong></u></h3>
+<p>系统应该对扩展开放，对修改关闭。开闭原则带来的好处：</p>
+<ol>
+<li>降低测试成本</li>
+<li>提高可复用性</li>
+<li>提高可维护性</li>
+<li>利于演进</li>
+</ol>
+<h3 id="u版本化u"><a class="markdownIt-Anchor" href="#u版本化u"></a> <u><strong>版本化</strong></u></h3>
+<ol>
+<li>接口版本化</li>
+<li>数据版本化</li>
+</ol>
+<h3 id="u一致性u"><a class="markdownIt-Anchor" href="#u一致性u"></a> <u><strong>一致性</strong></u></h3>
+<ol>
+<li>命名规则（形式上一致）</li>
+<li>基于概念上的分层（形式上一致）</li>
+<li>统一门面（形式、解决方案上一致）</li>
+<li>MVC、订阅-发布（解决方案、模式上一致）</li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>上述的<strong>如何做</strong>，从不同程度上回答了<strong>为什么</strong>出现的问题，以前的原则其实最本质的原则：</p>
+<ol>
+<li>正交性</li>
+<li>妥适性</li>
+<li>普遍性</li>
+<li>业务适应性</li>
+<li>高可用</li>
+</ol>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ol>
+<li>&lt;&lt;设计原本&gt;&gt;</li>
+<li>&lt;&lt;架构真经&gt;&gt;</li>
+<li>&lt;&lt;Java应用架构设计-模块化模式与OSGI&gt;&gt;</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/11/15/apigw/" rel="bookmark">API 网关设计</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/09/01/cxyznqy/" rel="bookmark">前言</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/04/10/fkztzj/" rel="bookmark">风控中台建设总结</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/04/10/htha/" rel="bookmark">高流量高可用应对策略</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/04/jgmsmb/" rel="bookmark">架构描述内容模版</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2021/05/22/jgyz/" title="架构原则">https://tech-insq.github.io/2021/05/22/jgyz/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 架构</a>
+              <a href="/tags/%E6%96%B9%E6%B3%95/" rel="tag"><i class="fa fa-tag"></i> 方法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/02/jsgh/" rel="prev" title="关于技术运营的思考">
+                  <i class="fa fa-chevron-left"></i> 关于技术运营的思考
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/09/01/cxyznqy/" rel="next" title="前言">
+                  前言 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

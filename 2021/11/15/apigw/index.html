@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="什么是API 网关？ API 网关是一种服务，它是外部使用内部服务的入口。API 网关在整个系统的架构位置如图所示：  API Gateway 是在负载均衡之后，它的主要作用是：   协议转换：外部服务一般是通过基于Https(Http)的RESTful 接口访问内部，而内部服务有可能采用其他协议的微服务框架，比如Dubbo、SOFA、Grpc、RESTful，所以需要协议转换。   请求路由：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="API 网关设计">
+<meta property="og:url" content="https://tech-insq.github.io/2021/11/15/apigw/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="什么是API 网关？ API 网关是一种服务，它是外部使用内部服务的入口。API 网关在整个系统的架构位置如图所示：  API Gateway 是在负载均衡之后，它的主要作用是：   协议转换：外部服务一般是通过基于Https(Http)的RESTful 接口访问内部，而内部服务有可能采用其他协议的微服务框架，比如Dubbo、SOFA、Grpc、RESTful，所以需要协议转换。   请求路由：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2021/11/15/apigw/api_gw_weiz.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/11/15/apigw/api_moshi.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/11/15/apigw/new-api-sch.png">
+<meta property="article:published_time" content="2021-11-15T12:21:11.000Z">
+<meta property="article:modified_time" content="2021-11-30T13:49:17.577Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="API">
+<meta property="article:tag" content="gateway">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2021/11/15/apigw/api_gw_weiz.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2021/11/15/apigw/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2021/11/15/apigw/","path":"2021/11/15/apigw/","title":"API 网关设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>API 网关设计 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFapi-%E7%BD%91%E5%85%B3"><span class="nav-number">1.</span> <span class="nav-text"> 什么是API 网关？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9C%89api%E7%BD%91%E5%85%B3"><span class="nav-number">2.</span> <span class="nav-text"> 为什么要有API网关？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1api%E7%BD%91%E5%85%B3"><span class="nav-number">3.</span> <span class="nav-text"> 如何设计API网关？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#api-gateway-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text"> API Gateway 设计模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#api-gateway-%E5%AE%9E%E7%8E%B0%E6%8A%80%E6%9C%AF"><span class="nav-number">3.2.</span> <span class="nav-text"> API Gateway 实现技术</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E7%9A%84%E6%96%B0%E8%B6%8B%E5%8A%BF"><span class="nav-number">4.</span> <span class="nav-text"> 未来的新趋势</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/11/15/apigw/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          API 网关设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-15 20:21:11" itemprop="dateCreated datePublished" datetime="2021-11-15T20:21:11+08:00">2021-11-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 21:49:17" itemprop="dateModified" datetime="2021-11-30T21:49:17+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84-New/" itemprop="url" rel="index"><span itemprop="name">架构.New</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="什么是api-网关"><a class="markdownIt-Anchor" href="#什么是api-网关"></a> 什么是API 网关？</h2>
+<p>API 网关是一种服务，它是外部使用内部服务的入口。API 网关在整个系统的架构位置如图所示：</p>
+<img src="/2021/11/15/apigw/api_gw_weiz.png" alt="api_gw_weiz" style="zoom:60%;">
+<p>API Gateway 是在负载均衡之后，它的主要作用是：</p>
+<ul>
+<li>
+<p>协议转换：外部服务一般是通过基于Https(Http)的RESTful 接口访问内部，而内部服务有可能采用其他协议的微服务框架，比如Dubbo、SOFA、Grpc、RESTful，所以需要协议转换。</p>
+</li>
+<li>
+<p>请求路由：由于内部服务一般是采用基于服务发现的机制进行互相通信，以及存在网络隔离（基于安全考虑、或者容器化部署）、协议转换，所以需要路由层。</p>
+</li>
+<li>
+<p>屏蔽内部变化：作为提供给第三方调用的接口，必须保持一定的稳定性，但是内部服务在不停地迭代，所以需要隔离内部变化的反腐层。</p>
+</li>
+<li>
+<p>组合API：组合API一方面是为了提高用户体验，因为App(Mobile)、第三方、HTML(H5)是属于低性能的互联网环境。而API Gate 跟微服务集群是属于高性能的局域网，所以有必要提供业务组合API来提高性能。组合 API一般基于业务，提供实现某个完整业务活动的API（粗力度），方便外部调用，起到聚合作用。</p>
+</li>
+<li>
+<p>针对“端”提供专有的API：在API Gateway 消化掉不同端的要求，满足不同端的要求，有可能会减少内部服务设计的复杂性。</p>
+</li>
+<li>
+<p>实现其他功能：身份验证、访问授权、缓存、服务治理（监控、告警、限流降级、业务可观测）、日志审计。</p>
+</li>
+</ul>
+<span id="more"></span>
+<h2 id="为什么要有api网关"><a class="markdownIt-Anchor" href="#为什么要有api网关"></a> 为什么要有API网关？</h2>
+<p>从上述，我们为什么要提供一个API网关，主要是基于如下的考虑：</p>
+<ul>
+<li>
+<p>协议转换。</p>
+</li>
+<li>
+<p>请求路由。</p>
+</li>
+<li>
+<p>组合API。</p>
+</li>
+<li>
+<p>反腐层（隔离内部变化）。</p>
+</li>
+<li>
+<p>隔离“端”的差异。</p>
+</li>
+<li>
+<p>其他边缘功能：身份验证、访问授权、限流降级、缓存、服务治理、日志审计。</p>
+<p>这几个点是我们进行API网关设计的出发点。假如内部领域服务（订单服务、用户服务、商品服务），有没有必要有API网关呢（订单服务、用户服务、商品服务都有自己单独的API Gateway）？ 如果没有上面几点作为存在的理由，内部领域服务是没有必要有API 网关的。但是领域服务的聚合服务从某种意义上来讲也是一种API Gateway，只是它的作用比较纯粹：领域服务的Agreegate，起到Bound Context 作用。</p>
+</li>
+</ul>
+<h2 id="如何设计api网关"><a class="markdownIt-Anchor" href="#如何设计api网关"></a> 如何设计API网关？</h2>
+<p>API网关模式，在实际实践中经常会遇到如下的问题：</p>
+<ul>
+<li>效率问题：迭代开发问题。</li>
+<li>技术性问题：比如性能、可扩展性、局部故障、稳定性。</li>
+<li>安全性问题：保护用户利益、保护公司利益、保护内部服务。</li>
+<li>平滑性问题：API Gateway 设计不好，往往会造成线上事故。</li>
+</ul>
+<h3 id="api-gateway-设计模式"><a class="markdownIt-Anchor" href="#api-gateway-设计模式"></a> API Gateway 设计模式</h3>
+<p><img src="/2021/11/15/apigw/api_moshi.png" alt="api_moshi"></p>
+<p>​        API Gateway 有两种常见的设计模式：</p>
+<ul>
+<li>统一的API模式：由API团队统一实现API Gateway。</li>
+<li>后端前置模式：每个业务团队各自实现API Gateway，由API 团队维护API公共模块。</li>
+</ul>
+<p>​       统一的模式，会遇到团队紧耦合的问题，使得团队（API团队、后端团队）无法松耦合、自治。比如在X厂消费金融，我就遇到类似的问题：X厂消费金融，从业务团队上分为贷超业务团队（引流）、自营团队（自有资金放款的）、风控团队。贷超团队负责开发跟各种端交互的接口，是API Gateway的维护团队。那么现在问题来，由于自营团队在后续的业务演变过程中，可能需要增加用户输入某些字段（自营业务变化，导致其对外提供的接口也会变化），而这些字段都要贷超接口进行透传，屡次导致自营业务迭代，贷超业务团队也要安排相应的迭代进行字段透传开发。这种模式影响到迭代开发、交付效率。</p>
+<p>​       基于这种问题，后来在业务中台建设规划中，我们重新设计了API Gateway，即采用后端前置模式。贷超和自营团队各自拥有自己的API Gateway，两个团队共用Public（鉴权、服务治理、安全、审计）。</p>
+<h3 id="api-gateway-实现技术"><a class="markdownIt-Anchor" href="#api-gateway-实现技术"></a> API Gateway 实现技术</h3>
+<p><strong>安全技术</strong></p>
+<ul>
+<li>采用加密方式，防止网络中间人。API Gateway 基本上都要求采用Https协议，甚至有时在Https协议的基础上，再次采用混合模式对请求Body 进行加密（采用AES 加密请求体，再用RSA加密一次密钥）。</li>
+<li>接口鉴权：用户登陆鉴权，比如采用JWT。</li>
+<li>防重放：比如基于时间戳+唯一ID的防重判断。</li>
+<li>接口验签：对接口请求体进行Hmac 等摘要验证。</li>
+<li>审计： API 访问日志收集，从而进行审计。</li>
+</ul>
+<p><strong>性能问题</strong></p>
+<ul>
+<li>并发模式：采用多线程模式进行并发（容易受限，操作系统线程是重量级的）。</li>
+<li>异步I/O：API Gateway 是属于网络I/O，可以使用Netty、Vertx、RSocket等异步框架，但这在实际上往往被采用的微服务框架所限制，很多时候微服务框架（Sofa、Dubbo）等在异步上支持不是很好，导致很多时候要么通过并发模式，要么是通过消息队列来提高性能。</li>
+<li>响应式编程：比如Java CompletableFutures、Flux &amp; Monos、RxJava。</li>
+</ul>
+<p><strong>局部故障</strong></p>
+<ul>
+<li>API Gateway 具备负载均衡能力。</li>
+<li>API Gateway 在调用下游服务的时候，除了设置超时之外，还需要采用断路器，比如采用hystrix 或者 Resilience4j CircuitBreaker。</li>
+<li>限流：采用Ratelimit 之类的工具对接口进行限流（超过阈值，直接放弃）。</li>
+<li>线程隔离：快接口与慢接口进行隔离（线程隔离，服务隔离）。</li>
+</ul>
+<p><strong>稳定性</strong></p>
+<p>​    这里的稳定性是指后端业务接口的改变（新增或者修改）等对API Gateway的影响，目前常用见问题：后端业务接口改变了，API Gateway 也会进行相应的改变。由于API Gateway 是外部服务使用内部服务的入口，频繁进行上线部署，对线上业务具有一定的影响。API Gateway 只是协议转换、请求路由、API组合，完全可以做到基于框架的稳定性。即只要能力完备、技术框架稳定，就可以达成长久不发版的目标。那该如何设计呢？参考未来的新趋势。</p>
+<p><strong>平滑性问题</strong></p>
+<p>​     很多时候，API Gateway 的接口进行重大变化，如果没有做好兼容，经常导致线上故障。因为APP版本升级到最新版本需要一段时间，如果之前的接口做了很大的变化，那么老版本的APP调用该接口，要么出现参数不全导致验证问题或者业务问题，要么返回结果形式改变导致APP进行了错误的处理。</p>
+<p>​     常有的解决方法，采用API版本号，新的APP调用新的接口，旧的APP调用老的接口，老的接口根据掉用量逐渐废弃。</p>
+<p><strong>服务治理</strong></p>
+<ul>
+<li>API Gateway 提供了面向业务的接口，其成功率直接影响了线上的业务。所以对API Gateway 提供的接口有必要做业务4大黄金指标的监控（成功率、平均耗时、请求量、资源利用率），基于4黄金指标，做业务可观测性假设，从而进行业务观测。</li>
+<li>全局调用链ID传递，打通前后端调用的调用链。</li>
+</ul>
+<h2 id="未来的新趋势"><a class="markdownIt-Anchor" href="#未来的新趋势"></a> 未来的新趋势</h2>
+<p>​     API Gateway 没有涉及到很深入的业务逻辑，只是业务接口的编排和聚合，所以通过配置式的编排来实现新的业务接口。这种方式叫模式驱动的API技术，比如GraphQL。</p>
+<p><img src="/2021/11/15/apigw/new-api-sch.png" alt="new-api-sch"></p>
+<p>关键设计：<br>
+1、API-Gateway-Admin 提供API治理工具：API模式配置、自动化测试工具、一键发布、以及API版本管理。</p>
+<p>2、Schema-Engin API 调用编排。</p>
+<p>3、RPC-Proxy 以及API-OutBox 实现对微服务框架的通用调用能力，这样就不会每次出现新接口或者新服务，都要重新集成该服务的客户端Proxy。其实基于RESTful 最容易实现该目的，Dubbo 也可以实现，因为RESTful 基于 Http协议 和 Dubbo 支持泛化调用。同时，我们可以利用一些胶水语言，比如Groovy 调用过程中进行参数处理，从而实现无缝调用。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/09/01/cxyznqy/" rel="bookmark">前言</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/05/22/jgyz/" rel="bookmark">架构原则</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/04/10/fkztzj/" rel="bookmark">风控中台建设总结</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/04/10/htha/" rel="bookmark">高流量高可用应对策略</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/04/jgmsmb/" rel="bookmark">架构描述内容模版</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2021/11/15/apigw/" title="API 网关设计">https://tech-insq.github.io/2021/11/15/apigw/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 架构</a>
+              <a href="/tags/API/" rel="tag"><i class="fa fa-tag"></i> API</a>
+              <a href="/tags/gateway/" rel="tag"><i class="fa fa-tag"></i> gateway</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/11/15/2021/" rel="prev" title="2021 年">
+                  <i class="fa fa-chevron-left"></i> 2021 年
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/11/17/jysk20211117/" rel="next" title="如何辅导小孩子学习？">
+                  如何辅导小孩子学习？ <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

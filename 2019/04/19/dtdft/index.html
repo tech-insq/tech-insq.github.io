@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="序 这是一篇《持续交付2.0》大型互联网团队的FT化读后感。 《持续交付2.0》 “8” 字环 基于敏捷开发、是敏捷理念、原则的实施过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大型互联网团队的FT化">
+<meta property="og:url" content="https://tech-insq.github.io/2019/04/19/dtdft/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="序 这是一篇《持续交付2.0》大型互联网团队的FT化读后感。 《持续交付2.0》 “8” 字环 基于敏捷开发、是敏捷理念、原则的实施过程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2019/04/19/dtdft/8.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/04/19/dtdft/gitflow.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/04/19/dtdft/devops1.png">
+<meta property="article:published_time" content="2019-04-18T23:09:17.000Z">
+<meta property="article:modified_time" content="2021-11-30T13:49:53.964Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="团队">
+<meta property="article:tag" content="改进">
+<meta property="article:tag" content="方法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2019/04/19/dtdft/8.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/04/19/dtdft/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/04/19/dtdft/","path":"2019/04/19/dtdft/","title":"大型互联网团队的FT化"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>大型互联网团队的FT化 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text"> 序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ft%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text"> FT是什么？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E5%9B%A2%E9%98%9F"><span class="nav-number">3.</span> <span class="nav-text"> 敏捷团队</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E8%A7%92%E8%89%B2"><span class="nav-number">3.1.</span> <span class="nav-text"> 核心角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E5%9B%A2%E9%98%9F"><span class="nav-number">3.2.</span> <span class="nav-text"> 完整团队</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E5%BF%B5"><span class="nav-number">3.3.</span> <span class="nav-text"> 理念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AC%E5%8F%98"><span class="nav-number">3.4.</span> <span class="nav-text"> 转变</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%82%E5%BA%94ft%E7%9A%84%E5%85%B6%E4%BB%96%E5%8F%98%E9%9D%A9"><span class="nav-number">4.</span> <span class="nav-text"> 适应FT的其他变革</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E8%A7%A3%E8%80%A6"><span class="nav-number">4.1.</span> <span class="nav-text"> 架构解耦</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E5%8F%91%E5%B8%83"><span class="nav-number">4.2.</span> <span class="nav-text"> 版本发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98%E5%B7%A5%E5%85%B7%E9%93%BE"><span class="nav-number">4.3.</span> <span class="nav-text"> 持续交付工具链</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ft%E5%85%A8%E5%9B%BE"><span class="nav-number">5.</span> <span class="nav-text"> FT全图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%8F%E6%8D%B7%E8%BD%AC%E5%9E%8B%E6%98%AF%E7%B3%BB%E7%BB%9F%E6%80%A7%E5%B7%A5%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text"> 敏捷转型是系统性工程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BD%AC%E5%9E%8B%E5%85%AB%E6%AD%A5%E6%9B%B2"><span class="nav-number">7.</span> <span class="nav-text"> 转型八步曲</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/04/19/dtdft/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          大型互联网团队的FT化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-19 07:09:17" itemprop="dateCreated datePublished" datetime="2019-04-19T07:09:17+08:00">2019-04-19</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 21:49:53" itemprop="dateModified" datetime="2021-11-30T21:49:53+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="序"><a class="markdownIt-Anchor" href="#序"></a> 序</h1>
+<p>这是一篇《持续交付2.0》大型互联网团队的FT化读后感。</p>
+<p>《持续交付2.0》 “8” 字环 基于敏捷开发、是敏捷理念、原则的实施过程。</p>
+<span id="more"></span>
+<p><img src="/2019/04/19/dtdft/8.png" alt></p>
+<blockquote class="blockquote-center">" 对于现代软件企业来说，持续交付2.0应该成为它的一种组织能力。"</blockquote>
+<p>那敏捷有哪些实践呢？</p>
+<table>
+<thead>
+<tr>
+<th>团队</th>
+<th>工作件</th>
+<th>管理实践</th>
+<th>技术实践</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>敏捷团队角色：<br>Product Owner<br>Scrum Master <br>Team</td>
+<td>产品Backlog<br>迭代Backlog</td>
+<td>迭代计划会议<br>每日站立会议</td>
+<td>用户故事<br>Anatomy 系统解剖</td>
+</tr>
+<tr>
+<td>完整团队实践</td>
+<td>完成标准</td>
+<td>可视化管理</td>
+<td>结对编程<br>TDD（测试驱动开发）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>迭代验收<br>迭代回顾会议</td>
+<td>持续集成</td>
+</tr>
+</tbody>
+</table>
+<h1 id="ft是什么"><a class="markdownIt-Anchor" href="#ft是什么"></a> FT是什么？</h1>
+<p>FT的概念是什么呢？FT 的含义：FeatureTeam(特色团队)，对应的组织动作是将职能型组织重新改造，建立成业务型组织。FT在敏捷实践中，称为完整团队。</p>
+<p>FT实践对应敏捷实践中的团队实践。</p>
+<h1 id="敏捷团队"><a class="markdownIt-Anchor" href="#敏捷团队"></a> 敏捷团队</h1>
+<h2 id="核心角色"><a class="markdownIt-Anchor" href="#核心角色"></a> 核心角色</h2>
+<table>
+<thead>
+<tr>
+<th>角色名称</th>
+<th>角色定义</th>
+<th>角色职责</th>
+<th>注意事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PO</td>
+<td>确保Team 做正确的事</td>
+<td>代表利益相关人（用户，用户，管理，Marketing），对产品投资回报负责<br>确定产品发布计划<br>定义产品需求，并确定优先级<br>验收迭代结果，并根据验收结果和需求变化刷新需求清单和优先级</td>
+<td>除了客户需求之外，内部任务如重构、持续集成环境搭建等也有PO纳入统一管理</td>
+</tr>
+<tr>
+<td>Scrum 教练</td>
+<td>确保Team 正确地做事</td>
+<td>辅导团队正确地应用敏捷实践<br>引导团队建立并遵守规则<br>保护团队不受打扰<br>推动解决团队遇到的障碍<br>激励团队</td>
+<td>不命令和控制Team</td>
+</tr>
+<tr>
+<td>Team</td>
+<td>负责产品需求实现</td>
+<td>负责估计工作量并根据自身能力找出最佳方案去完成任务且保证交付质量<br>向PO和利益相关人演示工作成果<br>团队自我管理、持续改进</td>
+<td>一般由5～9名跨功能领域组成<br>坐在一起工作<br>有共同的目标、共同担责<br>团队成员严格遵守团队规则</td>
+</tr>
+</tbody>
+</table>
+<h2 id="完整团队"><a class="markdownIt-Anchor" href="#完整团队"></a> 完整团队</h2>
+<table>
+<thead>
+<tr>
+<th>什么是完整团队</th>
+<th>关键要点</th>
+<th>好处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>敏捷开发中，以Story 为单位的持续交付要求<br>系统组、开发、测试等跨功能团队进行密切协同，<br><strong>相互独立的功能团队难以应对</strong></td>
+<td>成员来自多个功能领域：<br>拥有完成目标所需的各职能成员</td>
+<td>有助于团队成员形成共同目标和全局意识，促进个功能领域的拉通和融合</td>
+</tr>
+<tr>
+<td>完整团队是跨功能领域（需求分析师、设计师、<br>开发人员、测试人员、资料人员等）的人员组成<br>一个团队，坐在一起工作，团队成员遵循同一<br>计划，服从于同一项目经理。</td>
+<td>坐在一起办公：团队成员无障碍地沟通</td>
+<td>通过面对面沟通提升沟通效率</td>
+</tr>
+<tr>
+<td></td>
+<td>团队保持相对稳定：临时组建的团队产生效率较低，团队稳定非常关键</td>
+<td>实现团队成员的高度协同，支撑高密地、持续地、短周期的交付</td>
+</tr>
+</tbody>
+</table>
+<h2 id="理念"><a class="markdownIt-Anchor" href="#理念"></a> 理念</h2>
+<blockquote class="blockquote-center">激发团队潜能，加强协作</blockquote>
+<ul>
+<li>
+<p>研究表明面对面的沟通最有效。业界调查：一个50人开发团队，每人平均30%时间用于编码，70%的时间用于与其他成员交流。</p>
+</li>
+<li>
+<p>人是软件开发的决定因素。</p>
+</li>
+<li>
+<p>&quot;团队” 在“敏捷宣言”中的体现： 个体和交互  <strong>胜过</strong> 过程和工具</p>
+</li>
+</ul>
+<h2 id="转变"><a class="markdownIt-Anchor" href="#转变"></a> 转变</h2>
+<p><strong>管理者转变</strong></p>
+<table>
+<thead>
+<tr>
+<th>传统方式</th>
+<th>敏捷方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>管理者努力&quot;控制团队&quot;：<br>1、指定详细的工作计划，并作出详细的工作安排<br>2、指令性工作方式<br>3、监控过程<br>4、基于负责规则的管理</td>
+<td>管理者努力&quot;激发&quot;团队：<br>1、通过目标牵引团队自主工作<br>2、帮助团队提供资源，排除障碍<br>3、营造团队自我管理的工作氛围<br>4、作为教练辅导团队进步<br>5、基于简单原则的管理，原则简单但必须被遵守</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote-center">敏捷方式下对管理者最大的挑战是学会放松“控制”</blockquote>
+<p><strong>团队成员转变</strong></p>
+<table>
+<thead>
+<tr>
+<th>传统方式</th>
+<th>敏捷方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>团队成员是&quot;听从安排的独立贡献者&quot;：<br>1、被动等待主管下指令安排工作<br>2、独立工作为主，协作少<br>3、以文档和邮件为主要沟通方式<br>4、只关注个体任务&quot;做完&quot;，不关注团队目标</td>
+<td>团队成员是&quot;全方位的积极参与者&quot;：<br>1、共同参与计划制定和任务安排<br>2、团队协作贯穿工作始终<br>3、面对面交流是主要沟通方式<br>4、关注团队目标，共担责任<br>5、能力要求更广，主动学习适应岗位要求</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote-center">从被动到主动的心态转变是团队成员适应敏捷开发的关键</blockquote>
+<h1 id="适应ft的其他变革"><a class="markdownIt-Anchor" href="#适应ft的其他变革"></a> 适应FT的其他变革</h1>
+<h2 id="架构解耦"><a class="markdownIt-Anchor" href="#架构解耦"></a> 架构解耦</h2>
+<p>敏捷团队FT化，每个FT团队按照自己的节奏，持续交付。为了达到这个要求，必须对软件架构进行解耦。各自的FT团队尽量独立交付。</p>
+<pre class="mermaid">graph TB
+    subgraph FT1
+    界面层A1-->业务层A2
+    业务层A2-->存储层A3
+    end
+    subgraph FT2
+    界面层B1-->业务层B2
+    业务层B2-->存储层B3
+    end
+    subgraph FT3
+    界面层C1-->业务层C2
+    业务层C2-->存储层C3
+    end</pre>
+<p><strong>架构解耦遵从原则：</strong></p>
+<ul>
+<li>分层原则</li>
+<li>分治</li>
+<li>高内聚，低耦合</li>
+</ul>
+<h2 id="版本发布"><a class="markdownIt-Anchor" href="#版本发布"></a> 版本发布</h2>
+<p><img src="/2019/04/19/dtdft/gitflow.png" alt></p>
+<h2 id="持续交付工具链"><a class="markdownIt-Anchor" href="#持续交付工具链"></a> 持续交付工具链</h2>
+<p><img src="/2019/04/19/dtdft/devops1.png" alt></p>
+<h1 id="ft全图"><a class="markdownIt-Anchor" href="#ft全图"></a> FT全图</h1>
+<p><strong>FT化可能产生的问题</strong></p>
+<ul>
+<li>系统烟囱化、孤立化。</li>
+<li>重复造轮子、浪费研发。</li>
+<li>无法快速响应变化。</li>
+<li>FT化团队<strong>偏战斗</strong>团队，需要中台团队<strong>提升战斗能力输出</strong></li>
+<li>FT团队与中台团队的关系：作战单位和航母的关系</li>
+</ul>
+<pre class="mermaid">graph TB
+  subgraph FT全图
+  FT_A-->|依赖|中台
+  FT_B-->|依赖|中台
+  FT_C-->|依赖|中台 
+  end
+  subgraph 中台
+  中台 -.->|包含| 数据
+  中台 -.->|包含| 平台
+  中台 -.->|包含| 特种
+  中台 -.->|包含| 运维
+  中台 -.->|包含| 架构
+  end</pre>
+<h1 id="敏捷转型是系统性工程"><a class="markdownIt-Anchor" href="#敏捷转型是系统性工程"></a> 敏捷转型是系统性工程</h1>
+<pre class="mermaid">graph LR
+敏捷转型框架 -.- 实践
+敏捷转型框架 -.- 绩效
+敏捷转型框架 -.- 组织
+敏捷转型框架 -.- 过程
+敏捷转型框架 -.- 文化
+敏捷转型框架 -.- 管控
+敏捷转型框架 -.- 技术和业务对齐</pre>
+<blockquote class="blockquote-center">敏捷在转型不同阶段，敏捷转型框架的7个方面引入的优先级不一样，初期以实践为主</blockquote>
+<h1 id="转型八步曲"><a class="markdownIt-Anchor" href="#转型八步曲"></a> 转型八步曲</h1>
+<pre class="mermaid">graph TB
+  1思想动员 --> 2差距分析
+  2差距分析 --> 3.1环境和工具准备
+  2差距分析 --> 3.2敏捷实践技能准备和技术能力准备
+  3.1环境和工具准备 --> 确定开发模型和拟应用实践
+  3.2敏捷实践技能准备和技术能力准备 --> 确定开发模型和拟应用实践
+  确定开发模型和拟应用实践 --> 5敏捷实施
+  5敏捷实施 --> 6回顾评估与调整改进
+  6回顾评估与调整改进 --> 7激励表彰
+  7激励表彰 --> 8项目结束总结
+  7激励表彰 --> 5敏捷实施</pre>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/04/19/xtdnx/" rel="bookmark">小团队逆袭之旅</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/05/22/jgyz/" rel="bookmark">架构原则</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/04/19/dtdft/" title="大型互联网团队的FT化">https://tech-insq.github.io/2019/04/19/dtdft/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%A2%E9%98%9F/" rel="tag"><i class="fa fa-tag"></i> 团队</a>
+              <a href="/tags/%E6%94%B9%E8%BF%9B/" rel="tag"><i class="fa fa-tag"></i> 改进</a>
+              <a href="/tags/%E6%96%B9%E6%B3%95/" rel="tag"><i class="fa fa-tag"></i> 方法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/04/18/hello-world/" rel="prev" title="2019 年">
+                  <i class="fa fa-chevron-left"></i> 2019 年
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/04/19/xtdnx/" rel="next" title="小团队逆袭之旅">
+                  小团队逆袭之旅 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

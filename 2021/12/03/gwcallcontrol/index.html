@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="为什么要控制 网关在整个系统中起着重要的作用，如图所示：  Gateway 是系统的枢纽，它可以：   路由请求。   负载均衡。   流量控制。   具体参考：   在Gateway 做流量控制的好处：  标准化实施，一套代码、一套规则。 快速实施，无需对业务服务进行代码修改，降低实施成本。 可以避免业务服务请求堆积。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网关层流量控制方案总结">
+<meta property="og:url" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="为什么要控制 网关在整个系统中起着重要的作用，如图所示：  Gateway 是系统的枢纽，它可以：   路由请求。   负载均衡。   流量控制。   具体参考：   在Gateway 做流量控制的好处：  标准化实施，一套代码、一套规则。 快速实施，无需对业务服务进行代码修改，降低实施成本。 可以避免业务服务请求堆积。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/gw.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/res4j.webp">
+<meta property="og:image" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/proxylimit.jpg">
+<meta property="og:image" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/nginx.png">
+<meta property="og:image" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/Enovy.png">
+<meta property="article:published_time" content="2021-12-03T13:53:09.000Z">
+<meta property="article:modified_time" content="2021-12-04T15:37:48.310Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构.New">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2021/12/03/gwcallcontrol/gw.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2021/12/03/gwcallcontrol/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2021/12/03/gwcallcontrol/","path":"2021/12/03/gwcallcontrol/","title":"网关层流量控制方案总结"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>网关层流量控制方案总结 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%8E%A7%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text"> 为什么要控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%8E%A7%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text"> 如何控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E7%BB%BC%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text"> 方案综述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%86%94%E6%96%AD"><span class="nav-number">2.2.</span> <span class="nav-text"> 熔断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E6%B5%81"><span class="nav-number">2.3.</span> <span class="nav-text"> 限流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%96%BD"><span class="nav-number">3.</span> <span class="nav-text"> 实施</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E5%85%B3%E5%B1%82%E7%9A%84%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="nav-number">3.1.</span> <span class="nav-text"> 网关层的流量控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nginx-%E5%B1%82%E7%9A%84%E6%96%B9%E6%A1%88"><span class="nav-number">3.2.</span> <span class="nav-text"> Nginx 层的方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#enovy-%E7%9A%84%E6%96%B9%E6%A1%88"><span class="nav-number">3.3.</span> <span class="nav-text"> Enovy 的方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xds"><span class="nav-number">3.4.</span> <span class="nav-text"> xDS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">4.</span> <span class="nav-text"> 附录</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/12/03/gwcallcontrol/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网关层流量控制方案总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-03 21:53:09" itemprop="dateCreated datePublished" datetime="2021-12-03T21:53:09+08:00">2021-12-03</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-12-04 23:37:48" itemprop="dateModified" datetime="2021-12-04T23:37:48+08:00">2021-12-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E5%85%B3/" itemprop="url" rel="index"><span itemprop="name">网关</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E5%85%B3/%E9%99%90%E6%B5%81/" itemprop="url" rel="index"><span itemprop="name">限流</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E5%85%B3/%E9%99%90%E6%B5%81/%E7%86%94%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">熔断</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="为什么要控制"><a class="markdownIt-Anchor" href="#为什么要控制"></a> 为什么要控制</h2>
+<p>网关在整个系统中起着重要的作用，如图所示：</p>
+<p><img src="/2021/12/03/gwcallcontrol/gw.png" alt="gw"></p>
+<p>Gateway 是系统的枢纽，它可以：</p>
+<ol>
+<li>
+<p>路由请求。</p>
+</li>
+<li>
+<p>负载均衡。</p>
+</li>
+<li>
+<p>流量控制。</p>
+</li>
+<li>
+<p>具体参考：</p>
+</li>
+</ol>
+<p>在Gateway 做流量控制的好处：</p>
+<ol>
+<li>标准化实施，一套代码、一套规则。</li>
+<li>快速实施，无需对业务服务进行代码修改，降低实施成本。</li>
+<li>可以避免业务服务请求堆积。</li>
+</ol>
+<span id="more"></span>
+<p>如何在网关层进行流量控制，保障系统的健壮性呢？在回答如何实施之前，我们先来检视下，实际过程中遇到的问题：</p>
+<ol>
+<li>Server 变慢了（由于其他业务，比如外部依赖）。</li>
+<li>Server 出现故障了（比如服务不存在、超时）。</li>
+<li>突发情况，Client 发送的请求过多。</li>
+</ol>
+<p>针对上述的问题，网关进行流量控制（限流、熔断）为了保护：</p>
+<ol>
+<li>Server (问题3)</li>
+<li>Client（问题2）</li>
+<li>Server 和 Client (1)。</li>
+</ol>
+<p>其实，整个系统的关系是相互的，保护了A系统，最后也保护了B系统（A与B存在相互依赖关系），所以网关进行流控意义很大。</p>
+<h2 id="如何控制"><a class="markdownIt-Anchor" href="#如何控制"></a> 如何控制</h2>
+<h3 id="方案综述"><a class="markdownIt-Anchor" href="#方案综述"></a> 方案综述</h3>
+<p>如果Server 端故障了（不存在），那么本着快速失败的原则，应该采用熔断（尤其在服务调用超时比较长的场景下），采用限流可能稍微缓解。如果是Client 流量突增或者Server 变慢了，那么要采用限流。流量突发或变慢的问题，采用熔断不是很适合，因为一旦熔断，就拒绝了请求，从而扩大了影响面。</p>
+<p>那么如何熔断和限流呢？</p>
+<h3 id="熔断"><a class="markdownIt-Anchor" href="#熔断"></a> 熔断</h3>
+<p>针对由于Server 服务本身的问题，导致系统故障的这个问题，业界的常用解决方案，除了超时之外，还有熔断(基于快速失败的思路)。</p>
+<p><img src="/2021/12/03/gwcallcontrol/res4j.webp" alt="res4j"></p>
+<p><strong>原理：</strong></p>
+<p><u>关键参数</u>：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>failureRateThreshold</td>
+<td>基于某个时间窗口的失败率(阈 值)，比如http 500(业务失败 除外?)</td>
+<td>80%，即成功率20%</td>
+</tr>
+<tr>
+<td>slowCallRateThreshold</td>
+<td>慢请求占比</td>
+<td>60%，即慢请求率60%</td>
+</tr>
+<tr>
+<td>slowCallDurationThreshold</td>
+<td>慢请求判断阈值</td>
+<td>3000[ms]，内部服务一般 超过<em>1000[ms]</em> 就是慢请求</td>
+</tr>
+<tr>
+<td>permittedNumberOfCalls<br>InHalfOpenStatewaitDurationInOpenState</td>
+<td>半开状态下允许的请求阈值</td>
+<td>50，半开状态下能够通过的请求数。</td>
+</tr>
+<tr>
+<td>waitDurationInOpenState</td>
+<td>从状态OPEN 到HALF_OPEN 的 时间</td>
+<td>5000[ms]，熔断开启之 后，经过多少ms之后，进 入半开状态。</td>
+</tr>
+<tr>
+<td>minimumNumberOfCalls</td>
+<td>最低阈值(满足该值之后，才计 算失败率或者慢请求率)</td>
+<td>100，当前请求数没有到这 个数之前，是不会计算这么 率。</td>
+</tr>
+<tr>
+<td>slidingWindowSize</td>
+<td>窗口值(单位s)</td>
+<td>5s，在断路器关闭的情况 下，统计的窗口大小。</td>
+</tr>
+</tbody>
+</table>
+<p><u>状态变化</u>：</p>
+<ol>
+<li>
+<p>断路器关闭的情况下，根据时间窗口进行失败率或者慢请求率统计，如果达到阈值，则进入开启状 态。</p>
+</li>
+<li>
+<p>断路器开始的情况下，则拒绝请求，等待配置的时间，进入HALF_OPEN。</p>
+</li>
+<li>
+<p>断路器在HALF_OPEN的状态下，尝试接受请求(允许的请求数根据</p>
+<p>permittedNumberOfCallsInHalfOpenState 配置)，并统计失败率和慢请求率，如果不满足拦截 的条件，则进入关闭的状态，如果满足拦截的状态，则进入开启的状态。</p>
+</li>
+</ol>
+<p><u>效果</u>：</p>
+<ol>
+<li>事后类型，配置合理，可以使服务避免雪崩。</li>
+<li>这种技术属于事后保护<strong>Router</strong> 及 <strong>Client</strong>。</li>
+</ol>
+<h3 id="限流"><a class="markdownIt-Anchor" href="#限流"></a> 限流</h3>
+<h4 id="静态限流"><a class="markdownIt-Anchor" href="#静态限流"></a> 静态限流</h4>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>原理</th>
+<th>不足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>固定窗口 计数器</td>
+<td>1、将时间按照设定的周期划分为多个窗 口。<br>2、在当前时间窗口内每来一次请求就将计数器加一。<br> 3、如果计数器超过了限制数量，则拒绝服务。<br> 4、当时间到达下一个窗口时，计数器的 值重置。</td>
+<td>1、不准确。<br> 2、比如1秒限制5个请求，但是上一个窗口的<br>后半秒通过5个,在下一个窗口的<br>前半秒通过5 个，那么这个1秒<br>的窗口通过了10个，显然不准确。 <br>3、请求容易不均匀。</td>
+</tr>
+<tr>
+<td>滑动窗口 计数器</td>
+<td>1、将设定的时间周期设为滑动窗口的大 小，记录每次请求<br> 的时刻。 <br>2、当有新的请求到来时将窗口滑到该请 求来临的时刻。<br> 3、判断窗口内的请求数是否超过了限 制，超过限制则<br> 拒绝服务，否则请求通过。<br> 4、丢弃滑动窗口以外的请求。</td>
+<td>1、解决了固定窗口的问题。 2、复杂和耗内存。</td>
+</tr>
+<tr>
+<td>漏桶算法</td>
+<td>1、将进来的请求流量视为水滴先放入桶 内。<br> 2、水从桶的底部以固定的速率匀速流 出，相当于在匀速处理请求。<br> 3、当漏桶内的水满时(超过了限流阈值) 则拒绝服务。</td>
+<td>1、无法应对在限流阈值范围内的突发 请求。</td>
+</tr>
+<tr>
+<td>令牌桶算法</td>
+<td>1、按照一定的速率生产令牌并放入令牌 桶中。 <br>2、如果桶中令牌已满，则丢弃令牌。 <br>3、请求过来时先到桶中拿令牌，拿到令 牌则放行通过</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>令牌桶算法：</strong></p>
+<p>这种算法能够把请求均匀的分配在时间区间内，又能接受服务可承受范围内的突发请求。所以令牌桶算法在业内使用也非常广泛。</p>
+<p><strong>静态限流的优缺点：</strong></p>
+<p><u>优点：</u></p>
+<ol>
+<li>容易实现（代码实现）。</li>
+<li>事前、事中限流(对Server起到很好的保护，从而确保 整个系统的稳定)。</li>
+<li>一般采用历史高峰值*(5~10)倍，具有一定的经验性。</li>
+</ol>
+<p><u>缺点：</u></p>
+<ol>
+<li>阈值评估不准确，容易引发线 上的问题。不容易实施，需要多次调整。</li>
+</ol>
+<h4 id="动态限流"><a class="markdownIt-Anchor" href="#动态限流"></a> 动态限流</h4>
+<p>针对静态的限流方法的缺点，业界的实践方向尝试采用一种具备一定的适应性算法，该算法的整体思路:</p>
+<p>1、给出初始化的阈值，并观察某一个时间窗口，目标接口的响应情况。</p>
+<p>参考了相关的资料，这里介绍几种方法，这些方法都是参考TCP拥塞算法。</p>
+<p><strong>AMID算法</strong></p>
+<p>关键参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>initialConcurrencyLimit</td>
+<td>开始的并发数</td>
+</tr>
+<tr>
+<td>minConcurrencyLimit</td>
+<td>最小并发数</td>
+</tr>
+<tr>
+<td>maxConcurrencyLimit</td>
+<td>最大并发数</td>
+</tr>
+<tr>
+<td>windowSize</td>
+<td>计算观察到的延迟的时间窗口</td>
+</tr>
+<tr>
+<td>minRequests</td>
+<td>窗口中应包含的最小请求数，以便我们能够计算延迟。</td>
+</tr>
+<tr>
+<td>timeOut</td>
+<td>超时时间(最大容忍)</td>
+</tr>
+<tr>
+<td>percentile</td>
+<td>百分位线(99、95 或90，必须大于50，百分位值)</td>
+</tr>
+<tr>
+<td>backoffFactor</td>
+<td>下降因子</td>
+</tr>
+</tbody>
+</table>
+<p>原理：</p>
+<ol>
+<li>通过如上的参数(windowSize、minRequests、percentile)进行 指标(接口的响应耗时)观察 延迟。</li>
+<li>如果延迟&lt;timeOut，则initialConcurrencyLimit = initialConcurrencyLimit + 1(?5、10、20)，最 大不能超过maxConcurrencyLimit。</li>
+<li>如果延迟 &gt;= timeOut， initialConcurrencyLimit = initialConcurrencyLimit * backoffFactor， 且要大于等于minConcurrencyLimit。</li>
+<li>该算法比较简单backoffFactor 和 上升的速度值、timeOut 比较关键。</li>
+</ol>
+<p><strong>Vegas</strong> <strong>算法</strong></p>
+<ol>
+<li>
+<p>定义:MRT_NoLoad，系统正常工作时观察到的MRT 。</p>
+</li>
+<li>
+<p>计算过程:</p>
+<p>初始时:MRT_NoLoad 为null，在第一个统计周期之后，设置这个周期的MRT(观察的RT)。</p>
+<p>下一个统计周期之后，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">`<span class="keyword">if</span> (MRT &lt; MRT_NoLoad )&#123;   </span><br><span class="line">  MRT_NoLoad  = MRT; ` 								</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>每X周期之后，将MRT_NoLoad = MRT(探测新的MRT)。</p>
+</li>
+<li>
+<p>并发限制算法</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">`queueSize = currentConcurrencyLimit * (<span class="number">1</span> - MRT_NoLoad / MRT)</span><br><span class="line"> alpha     = <span class="number">3</span> * <span class="built_in">Log10</span> (currentConcurrencyLimit) </span><br><span class="line"> beta      = <span class="number">6</span> * <span class="built_in">Log10</span> (currentConcurrencyLimit) </span><br><span class="line"> threshold = <span class="built_in">Log10</span> (currentConcurrencyLimit) ` 							 			</span><br></pre></td></tr></table></figure>
+<p>如果当前 MRT &gt;= MRT_NoLoad，则触发并发限制。</p>
+<p><u>例子:</u><br>
+假如当前currentConcurrencyLimit = 100，当作上述的公式计算:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alpha =<span class="number">3</span>*<span class="number">2</span>=<span class="number">6</span> </span><br><span class="line">beta = <span class="number">6</span> * <span class="number">2</span> = <span class="number">12</span> </span><br><span class="line">threshold = <span class="number">2</span> </span><br></pre></td></tr></table></figure>
+<p>----------------分割线-------------------</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>MRT_NoLoad</th>
+<th>MRTLimit</th>
+<th>queueSize</th>
+<th>满足条件</th>
+<th>并发调整</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无 排 队</td>
+<td>200</td>
+<td>204</td>
+<td>1.96</td>
+<td>queueSize &lt;= threshold</td>
+<td>newLimit = currentLimit + beta;</td>
+</tr>
+<tr>
+<td>有排队</td>
+<td>200</td>
+<td>212</td>
+<td>5.66</td>
+<td>hreshold &lt; queueSize &lt; alpha</td>
+<td>newLimit = currentLimit + Log10 (currentLimit);</td>
+</tr>
+<tr>
+<td>过载</td>
+<td>300</td>
+<td>227</td>
+<td>11.89</td>
+<td>alpha &lt;= queueSize &lt; beta</td>
+<td>newLimit = currentLimit - Log10 (currentLimit);</td>
+</tr>
+</tbody>
+</table>
+<p><strong>梯队算法</strong></p>
+<ol>
+<li>
+<p>定义 longMRT:最近N 周期统计的MRT的活动平均值。</p>
+</li>
+<li>
+<p>计算公式:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gradient = <span class="built_in">Max</span>(<span class="number">0.5</span>,<span class="built_in">Min</span>(<span class="number">1.0</span>, tolerance * longMRT/shortMRT))</span><br><span class="line">newLimit = gradient * currentLmit + queueSize</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>初始:tolerance = 2(容忍系数)，gradient = 0.9(初始值，接近1)，queueSize= 4(固定 值)。</p>
+</li>
+<li>
+<p>过载恢复:短的MRT将开始减少，但长的MRT可能需要一定的时间才能恢复，所以在更新周期中可 以使用如下的公式加快恢复:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">longMRT = longMRT * <span class="number">0.95</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>总结</strong></p>
+<ol>
+<li>自适应算法根据系统的响应反馈，动态调整。</li>
+<li>需要不停地调参。</li>
+<li>需要计算历史指标。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AMID</td>
+<td>1、简单<br>2、类似计数器。</td>
+<td>1、需要给定参考值TimeOut</td>
+</tr>
+<tr>
+<td>Vegas</td>
+<td>1、不需要给定参考值TimeOut。</td>
+<td>1、公式如何来的？</td>
+</tr>
+<tr>
+<td>梯度算法</td>
+<td>1、稳定状态:表现良好。<br> 2、稳定状态到过载的过程:能够降低并发，降 低负载。</td>
+<td>1、longMRT 需要一定周期的 计算。</td>
+</tr>
+</tbody>
+</table>
+<p>这几个算法都在TCP 拥塞算法中，从实践的角度来看，应该是经过验证的，不足需要统计(计算量相对 大一些，如果实现不好会影响性能，所以要采用旁路计算方式)。</p>
+<h2 id="实施"><a class="markdownIt-Anchor" href="#实施"></a> 实施</h2>
+<h3 id="网关层的流量控制"><a class="markdownIt-Anchor" href="#网关层的流量控制"></a> 网关层的流量控制</h3>
+<p><img src="/2021/12/03/gwcallcontrol/proxylimit.jpg" alt="proxylimit"></p>
+<p>网关层的限流有如下优势：</p>
+<ol>
+<li>增加/减少限制具有更平滑的控制效果。</li>
+<li>如果增加并发限制，则允 许更多请求在队列中等待。队列中等待的请求数与当前限制成正比。</li>
+<li>如果限制降低，则需要等待队列的 请求将减少。如果限制低于线程数 ，则服务内不会发生排队。</li>
+</ol>
+<h3 id="nginx-层的方案"><a class="markdownIt-Anchor" href="#nginx-层的方案"></a> Nginx 层的方案</h3>
+<p>Nginx 本身具备简单的流量控制，但要进一步实现流量控制，需要借助LUA语言。从个人的经验来看，LUA语言不能实现太复杂的功能，有如下的考虑：</p>
+<ol>
+<li>维护成本：LUA语言接触的人群相对比较少。</li>
+<li>灵活性：具备实时配置网关层的流量控制策略。</li>
+<li>实现丰富的流量控制功能：实现丰富的流量控制功能，比如动态限流方案需要依赖实时数据分析（性能指标分析、观察）。</li>
+<li>简单性：在Nginx 层倾向简单的逻辑，把复杂留给代理。</li>
+</ol>
+<p><img src="/2021/12/03/gwcallcontrol/nginx.png" alt="nginx"></p>
+<ol>
+<li>采用外挂Agent的方式，使得LUA 脚本简单化，降低LUA引发的故障，Nginx 与Agent 是进程间通信（不需要跨机器、跨容器），保证交互在可接受的耗时范围内。</li>
+<li>策略调整能够实时生效，具备线上运维的灵活性。</li>
+<li>采用实时流计算，降低策略检查的耗时，争取对Nginx达到0负担的增加。</li>
+<li>Dashboard 增加对系统的可观测性和策略实时派发。</li>
+</ol>
+<h3 id="enovy-的方案"><a class="markdownIt-Anchor" href="#enovy-的方案"></a> Enovy 的方案</h3>
+<p>Enovy 的方案也类似，直接在Filter 层（利用Lua 与多语言扩展沙箱 WebAssembly，不建议采用C++）实现。如图是整个原理图：</p>
+<p><img src="/2021/12/03/gwcallcontrol/Enovy.png" alt="Enovy"></p>
+<h3 id="xds"><a class="markdownIt-Anchor" href="#xds"></a> xDS</h3>
+<p>网关功能的演进，已经不满足单纯的请求转发功能，网关可以负责解决不同服务的服务注册发现、负载均衡、配额流控、监控日志、缓存加速、配置分离、安全管控、跟踪审计等问题。从功能上，可以分为“数据”和“控制”。</p>
+<p><strong>数据面：</strong></p>
+<ul>
+<li>路由转发</li>
+<li>负载均衡</li>
+<li>安全通信</li>
+<li>缓存加速</li>
+<li>认证鉴权</li>
+<li>日志审计</li>
+<li>健康检查</li>
+<li>熔断限流</li>
+</ul>
+<p><strong>控制面</strong></p>
+<ul>
+<li>注册发现</li>
+<li>配置管控</li>
+<li>弹性伸缩</li>
+<li>统筹遥测</li>
+<li>容错自愈</li>
+<li>策略执行</li>
+<li>证书签发</li>
+</ul>
+<p>这些功能希望用配置的方式动态生效，从这个角度来看通过Agent 实现负责的计算逻辑，然后通过简单的配置发送，就可以实现较丰富的限流能力，从这点来看，架构是合理的。</p>
+<h2 id="附录"><a class="markdownIt-Anchor" href="#附录"></a> 附录</h2>
+<ol>
+<li>WebAssembly：它是一种低级的类汇编语言，具有紧凑的二进制格式，可以接近原生的性能运行，并为诸如 C/C ++ 等语言提供一个编译目标，以便它们可以在 Web 上运行。它也被设计为可以与 JavaScript 共存，允许两者一起工作。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2021/12/03/gwcallcontrol/" title="网关层流量控制方案总结">https://tech-insq.github.io/2021/12/03/gwcallcontrol/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84-New/" rel="tag"><i class="fa fa-tag"></i> 架构.New</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/11/19/xxzs20211119/" rel="prev" title="小学一到三年级知识穿插检测">
+                  <i class="fa fa-chevron-left"></i> 小学一到三年级知识穿插检测
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

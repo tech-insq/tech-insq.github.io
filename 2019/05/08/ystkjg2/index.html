@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="前言 本篇还是继续《视图方法架构描述》，对未完成的视点进行说明：  并发 开发 部署 运维 一致性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="视图方法架构描述（下）">
+<meta property="og:url" content="https://tech-insq.github.io/2019/05/08/ystkjg2/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="前言 本篇还是继续《视图方法架构描述》，对未完成的视点进行说明：  并发 开发 部署 运维 一致性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2019/05/08/ystkjg2/styz.png">
+<meta property="article:published_time" content="2019-05-08T09:22:45.000Z">
+<meta property="article:modified_time" content="2021-11-30T13:47:08.769Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="架构 - 原则 - 视图">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2019/05/08/ystkjg2/styz.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/05/08/ystkjg2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/05/08/ystkjg2/","path":"2019/05/08/ystkjg2/","title":"视图方法架构描述（下）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>视图方法架构描述（下） | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text"> 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91"><span class="nav-number">2.</span> <span class="nav-text"> 并发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text"> 模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B4%BB%E5%8A%A8"><span class="nav-number">2.2.</span> <span class="nav-text"> 活动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text"> 状态模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E8%A7%86%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text"> 开发视点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E7%82%B9"><span class="nav-number">3.1.</span> <span class="nav-text"> 关注点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B-2"><span class="nav-number">3.2.</span> <span class="nav-text"> 模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%E8%A7%86%E7%82%B9"><span class="nav-number">4.</span> <span class="nav-text"> 部署视点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E7%BB%B4%E8%A7%86%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text"> 运维视点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E7%82%B9-2"><span class="nav-number">5.1.</span> <span class="nav-text"> 关注点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">6.</span> <span class="nav-text"> 视图一致性</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/05/08/ystkjg2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          视图方法架构描述（下）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-05-08 17:22:45" itemprop="dateCreated datePublished" datetime="2019-05-08T17:22:45+08:00">2019-05-08</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 21:47:08" itemprop="dateModified" datetime="2021-11-30T21:47:08+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h1>
+<p>本篇还是继续《视图方法架构描述》，对未完成的视点进行说明：</p>
+<ul>
+<li>并发</li>
+<li>开发</li>
+<li>部署</li>
+<li>运维</li>
+<li>一致性</li>
+</ul>
+<span id="more"></span>
+<h1 id="并发"><a class="markdownIt-Anchor" href="#并发"></a> 并发</h1>
+<table>
+<thead>
+<tr>
+<th>定义</th>
+<th>描述了系统的并发结构，并且把功能元素映射到并发单元上，以清晰地识别出<br>系统能够并发执行的部分，以及这是如何协调和控制的。</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关注点</td>
+<td>任务结构、功能元素以及任务的映射关系、进程间通信、状态管理、同步和整合、<br>支持可伸缩性、启动和关闭、任务故障，以及重入。</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>系统级别的并发模型和状态模型</td>
+</tr>
+<tr>
+<td>问题和缺陷</td>
+<td>对错误的并发建模，错误地对并发建模，过度复杂、资源争夺、死锁和竞争条件</td>
+</tr>
+<tr>
+<td>利益相关者</td>
+<td>沟通者、开发者、测试人员和某些管理员</td>
+</tr>
+<tr>
+<td>适用性</td>
+<td>所有带有大量并发执行线程的系统</td>
+</tr>
+</tbody>
+</table>
+<h2 id="模型"><a class="markdownIt-Anchor" href="#模型"></a> 模型</h2>
+<p>并发视图会使用并发模型把功能元素映射到运行时的执行实体上。并发模型通常会包含以下项目：</p>
+<ul>
+<li>
+<p>进程：操作系统进程</p>
+</li>
+<li>
+<p>进程组</p>
+</li>
+<li>
+<p>线程</p>
+</li>
+<li>
+<p>进程间通信：过程调用机制（消息传递）、执行协调机制（信号量、文件、管道、互斥）、数据共享机制、消息传递机制（RPC、消息订阅）</p>
+</li>
+</ul>
+<p><strong>标记法：</strong></p>
+<ul>
+<li>UML</li>
+</ul>
+<h2 id="活动"><a class="markdownIt-Anchor" href="#活动"></a> 活动</h2>
+<ul>
+<li>建立元素与任务的映射关系</li>
+<li>决定线程设计</li>
+<li>定义资源共享的机制</li>
+<li>定义要使用的IPC机制</li>
+<li>为线程和进程分配优先级</li>
+<li>分析死锁</li>
+<li>分析竞争</li>
+</ul>
+<h2 id="状态模型"><a class="markdownIt-Anchor" href="#状态模型"></a> 状态模型</h2>
+<ul>
+<li>状态</li>
+<li>转换</li>
+<li>事件</li>
+<li>动作</li>
+</ul>
+<h1 id="开发视点"><a class="markdownIt-Anchor" href="#开发视点"></a> 开发视点</h1>
+<table>
+<thead>
+<tr>
+<th>定义</th>
+<th>描述支持软件开发过程中的架构</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关注点</td>
+<td>模块组织、通用处理、设计的标准化、测试的标准化、测试辅助<br>以及代码行组织</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>模块结构模型、通用设计模型、代码行模型</td>
+</tr>
+<tr>
+<td>问题和缺陷</td>
+<td>过多细节、过载的架构描述、不平均的重点、缺少开发者关注、精度不足<br>以及特定环境的问题</td>
+</tr>
+<tr>
+<td>利益相关者</td>
+<td>生产工程师、软件开发人员和测试人员</td>
+</tr>
+<tr>
+<td>适用性</td>
+<td>所有在创建过程中涉及重要软件开发的系统</td>
+</tr>
+</tbody>
+</table>
+<p>​</p>
+<h2 id="关注点"><a class="markdownIt-Anchor" href="#关注点"></a> 关注点</h2>
+<ul>
+<li>模块组织：模块是指由源文件组织成大型的单元。在逻辑结构中，组织代码有助于管理它们之间的依赖关系。</li>
+<li>通用处理：把通用处理识别并隔离到分离的代码模块中。</li>
+<li>设计的标准化：通过设计模式或者现成的软件元素来实现设计的标准化。</li>
+<li>测试的标准化：测试方法、技术和规范的标准化来确保测试的方法一致，并加速测试过程。关键问题包括测试工具、基础架构、标准测试数据、标准测试方法和测试自动化。</li>
+<li>测试辅助：是一种实践，它会插入特定的代码，从而记录测试步骤、系统状态、资源使用等信息的日志。</li>
+<li>代码行组织</li>
+</ul>
+<h2 id="模型-2"><a class="markdownIt-Anchor" href="#模型-2"></a> 模型</h2>
+<ul>
+<li>模块结构模型</li>
+</ul>
+<p>​      活动：</p>
+<p>​      1、识别模块并对其分类</p>
+<p>​     2、识别模块的依赖关系</p>
+<p>​     3、识别分层规则</p>
+<ul>
+<li>通用设计模型</li>
+</ul>
+<p>​      为了使元素实现的通用性最大化，需要定义一系列设计约束，当设计约束的软件元素的时候就应该应用它们。</p>
+<p>​     这样的设计约束基于<strong>两种基本原因</strong>而很有<strong>价值</strong>：</p>
+<p>​     1、在解决特定类型问题的时候。</p>
+<p>​     2、系统元素之间的通用性有助于提升系统整体上的技术统一性，使得它易于理解、操作和维护。</p>
+<p>​    <strong>通用性设计模型</strong> 会拥有以下三个重要部分：</p>
+<p>​    1、对跨元素所需要通用处理的定义。</p>
+<p>​    2、对设计系统元素时所要使用的标准设计方法的定义。</p>
+<p>​    3、对应该使用何种通用软件，以及应该如何使用的定义。</p>
+<p><strong>例子</strong></p>
+<p>1、记录消息日志</p>
+<p>2、通用的错误状态流程（支付异常状态流程）</p>
+<p>3、标准化设计（国际化、区分地域资源）</p>
+<p>4、标准化组件：消息日志、ORM组件、缓存组件、消息队列组件</p>
+<h1 id="部署视点"><a class="markdownIt-Anchor" href="#部署视点"></a> 部署视点</h1>
+<table>
+<thead>
+<tr>
+<th>定义</th>
+<th>描述系统将要部署的环境，以及系统与其中元素的依赖关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关注点</td>
+<td>所需的运行时平台、所需硬件或部署规格和品质、第三方软件需要、技术兼容性、<br>网络需求、所需网络能力、物理约束。</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>运行时平台模型、网络模型、技术依赖关系模型、模型间关系</td>
+</tr>
+<tr>
+<td>问题和缺陷</td>
+<td>不清晰或不精确的依赖关系、未经过验证的技术、不合适或者遗漏的服务级别协议<br>缺少专家技术知识、未能及时考虑部署环境、忽略站点之间的复杂度、提供的净空<br>不合适，以及没有指定灾难恢复环境</td>
+</tr>
+<tr>
+<td>利益相关者</td>
+<td>系统管理员、开发人员、测试人员、沟通者和评估者</td>
+</tr>
+<tr>
+<td>适用性</td>
+<td>部署环境复杂或不常见的系统</td>
+</tr>
+</tbody>
+</table>
+<h1 id="运维视点"><a class="markdownIt-Anchor" href="#运维视点"></a> 运维视点</h1>
+<table>
+<thead>
+<tr>
+<th>定义</th>
+<th>描述当系统运行在生产环境中时，如何对其进行运维、管理和支持</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>关注点</td>
+<td>安装和升级、功能迁移、数据迁移、操作监控和控制、警告、配置管理、性能监控<br>支持、备份和还原、在第三方环境中的运维。</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>安装模型、迁移模型、配置管理模型、管理模型、支持模型。</td>
+</tr>
+<tr>
+<td>问题和缺陷</td>
+<td>缺少运维人员的参与、缺少撤消计划、缺少迁移计划、不充分的迁移窗口<br>缺少管理工具、生产环境约束、缺少与生产环境的整合、备份模型不充分、<br>不合适的警告。</td>
+</tr>
+<tr>
+<td>利益相关者</td>
+<td>系统管理员、生产工程师、开发人员、测试人员、沟通者、评估者</td>
+</tr>
+<tr>
+<td>适用性</td>
+<td>所有部署到复杂或者重要运维环境中的系统</td>
+</tr>
+</tbody>
+</table>
+<h2 id="关注点-2"><a class="markdownIt-Anchor" href="#关注点-2"></a> 关注点</h2>
+<ul>
+<li>功能迁移： 大爆炸、并行运行、阶段迁移。</li>
+</ul>
+<h1 id="视图一致性"><a class="markdownIt-Anchor" href="#视图一致性"></a> 视图一致性</h1>
+<p>如下是视图间的依赖关系：</p>
+<p><img src="/2019/05/08/ystkjg2/styz.png" alt></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/26/sjkjg2/" rel="bookmark">用视角看架构（下）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/18/sjkjg/" rel="bookmark">用视角看架构（上）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/05/08/ystkjg/" rel="bookmark">视图方法架构描述（上）</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/05/08/ystkjg2/" title="视图方法架构描述（下）">https://tech-insq.github.io/2019/05/08/ystkjg2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84-%E5%8E%9F%E5%88%99-%E8%A7%86%E5%9B%BE/" rel="tag"><i class="fa fa-tag"></i> 架构 - 原则 - 视图</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/05/08/yjsmzqgl/" rel="prev" title="硬件生命周期管理">
+                  <i class="fa fa-chevron-left"></i> 硬件生命周期管理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/05/18/sjkjg/" rel="next" title="用视角看架构（上）">
+                  用视角看架构（上） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

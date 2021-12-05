@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="系统问题域  吞吐量（瞬时高峰） 到达率 流控 可用性（与第三方推送渠道链路问题、推送系统本身的可用性） 失败重试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="推送系统设计">
+<meta property="og:url" content="https://tech-insq.github.io/2019/03/23/psxtsj/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="系统问题域  吞吐量（瞬时高峰） 到达率 流控 可用性（与第三方推送渠道链路问题、推送系统本身的可用性） 失败重试">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2019/03/23/psxtsj/xtjiagou.png">
+<meta property="article:published_time" content="2019-03-23T05:50:21.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:12:18.346Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="软件">
+<meta property="article:tag" content="架构">
+<meta property="article:tag" content="设计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2019/03/23/psxtsj/xtjiagou.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/03/23/psxtsj/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/03/23/psxtsj/","path":"2019/03/23/psxtsj/","title":"推送系统设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>推送系统设计 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E9%97%AE%E9%A2%98%E5%9F%9F"><span class="nav-number">1.</span> <span class="nav-text"> 系统问题域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A6%82%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text"> 设计概要</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E9%80%81%E6%B8%A0%E9%81%93%E9%80%89%E6%8B%A9"><span class="nav-number">2.1.</span> <span class="nav-text"> 推送渠道选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text"> 系统架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%85%B3%E9%94%AE%E7%82%B9"><span class="nav-number">2.3.</span> <span class="nav-text"> 设计关键点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E9%87%8D%E5%A4%8D%E9%80%A0%E8%BD%AE%E5%AD%90"><span class="nav-number">3.</span> <span class="nav-text"> 不重复造轮子</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/03/23/psxtsj/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          推送系统设计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-23 13:50:21" itemprop="dateCreated datePublished" datetime="2019-03-23T13:50:21+08:00">2019-03-23</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:12:18" itemprop="dateModified" datetime="2021-11-30T22:12:18+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">工程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="系统问题域"><a class="markdownIt-Anchor" href="#系统问题域"></a> 系统问题域</h2>
+<ul>
+<li>吞吐量（瞬时高峰）</li>
+<li>到达率</li>
+<li>流控</li>
+<li>可用性（与第三方推送渠道链路问题、推送系统本身的可用性）</li>
+<li>失败重试</li>
+</ul>
+<span id="more"></span>
+<h2 id="设计概要"><a class="markdownIt-Anchor" href="#设计概要"></a> 设计概要</h2>
+<h3 id="推送渠道选择"><a class="markdownIt-Anchor" href="#推送渠道选择"></a> 推送渠道选择</h3>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>Android</th>
+<th>IOS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中国</td>
+<td>信鸽、极光、个推</td>
+<td>信鸽、极光、个推、Apns</td>
+</tr>
+<tr>
+<td>非中国</td>
+<td>FCM</td>
+<td>Apns</td>
+</tr>
+</tbody>
+</table>
+<p>针对Android 推送由于FCM 在国内不是很稳定，而且国内手机大部分没有安装GooglePlay，所以不建议使用FCM。但是在国外则建议采用FCM（建议使用Firebase admin SDK，或者XMPP）。</p>
+<h3 id="系统架构"><a class="markdownIt-Anchor" href="#系统架构"></a> 系统架构</h3>
+<p><img src="/2019/03/23/psxtsj/xtjiagou.png" alt></p>
+<h3 id="设计关键点"><a class="markdownIt-Anchor" href="#设计关键点"></a> 设计关键点</h3>
+<ul>
+<li>
+<p>消息队列的作用：</p>
+<p>解决瞬时高峰的问题，尤其在推送广播消息的时候，需要对广播消息进行流控，按照固定的速率进行推送，即满足FCM 和Apns 的流控要求，同时为了不对自身系统（比如出口网络带宽、DB、下游Adapter）带来冲击。所以采用消息队列基于pipeline 模式，将实时消息流控和广播推送流控用统一的模式进行处理。</p>
+</li>
+<li>
+<p>Adapter ：</p>
+<p>适配推送渠道，减少引入新的渠道对系统造成的变化。同时根据不同的策略进行路由。路由策略：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>基于设备模式（安卓或者iOS）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>基于手机品牌（比如有厂商通道，则优先选择厂商通道）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>基于区域（中国 或者 非中国）</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>推送渠道失败尝试机制：</p>
+<p>（1）在推送过程中，如果遇到网络问题则建议采用Exponetial BackOff 进行重试。</p>
+<p>（2）对于无效Token 则放弃尝试。</p>
+<p>（3）对于推送渠道，虽然在Push-Dispatch 有流控，自己本身也要有流控策略（可以采用令牌桶）进行流</p>
+<p>​           控，如果自己本身由于网络异常，对堆积的消息进行超时丢弃，并将结果发送到消息队列中。</p>
+</li>
+<li>
+<p>State-Job：</p>
+<p>消息状态机任务，将消息状态扭转。</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>发送成功</td>
+<td>1: 更新消息状态</td>
+</tr>
+<tr>
+<td>网络异常</td>
+<td>1: 基于Exponetial BackOff 机制 算出下次尝试时间，并将尝试任务写入DB。</td>
+</tr>
+<tr>
+<td>到达</td>
+<td>1: 更新消息状态</td>
+</tr>
+<tr>
+<td>未达</td>
+<td>1: 由于推送渠道FCM 或者Apns 具有存储消息等用户在线，再推送到功能。<br>2: 所以没有必要进行未达尝试。</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<h2 id="不重复造轮子"><a class="markdownIt-Anchor" href="#不重复造轮子"></a> 不重复造轮子</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/ZhiYu2018/app.push">集成推送</a></p>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/ZhiYu2018/app.push">https://github.com/ZhiYu2018/app.push</a></strong></p>
+<p>使用方法：</p>
+<ul>
+<li>自己开发Push-Server，将消息写入DB。</li>
+<li>采用定时任务（脚本）将消息推送给app.push。</li>
+<li>由于app.push 没有做消息路由，则自己要进行任务路由。</li>
+<li>对于Android 消息，建议采用fcm.xmpp 方法。</li>
+</ul>
+<p>Fcm.xpp关键数据：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数据量</th>
+<th>百分比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server-FCM 送达率</td>
+<td>66000</td>
+<td>98.2%</td>
+</tr>
+<tr>
+<td>FCM-Device（设备）到达率</td>
+<td>66000</td>
+<td>60%</td>
+</tr>
+</tbody>
+</table>
+<p>数据说明：</p>
+<p>1、Server-FCM 送达率：在测试过程中，由于无效Token 占1100，所以送达率是98.2%，如果是有效Token则100%。这只要在设计中 要进行流控、失败尝试。</p>
+<p>2、FCM-Device 到达率： 这个取决于所取测试样本的用户情况。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/04/17/ywxtjk/" rel="bookmark">业务监控系统设计</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/02/12/agile/" rel="bookmark">敏捷研发流程实践</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/01/08/rzf2019xnjh/" rel="bookmark">任正非新年致全体员工信</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/11/15/apigw/" rel="bookmark">API 网关设计</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/09/01/cxyznqy/" rel="bookmark">前言</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/03/23/psxtsj/" title="推送系统设计">https://tech-insq.github.io/2019/03/23/psxtsj/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 软件</a>
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 架构</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1/" rel="tag"><i class="fa fa-tag"></i> 设计</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/03/10/push-wenti/" rel="prev" title="PUSH 问题">
+                  <i class="fa fa-chevron-left"></i> PUSH 问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/03/23/tjyzl/" rel="next" title="统计与真理">
+                  统计与真理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

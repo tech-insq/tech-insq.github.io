@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-ApURUf3WT5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic%7CRoboto+Slab:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="PUSH 链路分析  系统链路 先从PUSH 相关的链路分析， 一条消息传递到客户端，需要经过的链路：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PUSH 问题">
+<meta property="og:url" content="https://tech-insq.github.io/2019/03/10/push-wenti/index.html">
+<meta property="og:site_name" content="道心">
+<meta property="og:description" content="PUSH 链路分析  系统链路 先从PUSH 相关的链路分析， 一条消息传递到客户端，需要经过的链路：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tech-insq.github.io/2019/03/10/push-wenti/%E5%8F%91%E9%80%81%E9%93%BE%E8%B7%AF.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/03/10/push-wenti/Push%E8%BD%AC%E5%8C%96%E7%8E%87%E6%A0%B9%E5%9B%A0.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/03/10/push-wenti/Push%E7%BB%9F%E8%AE%A1%E5%8F%A3%E5%BE%84.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/03/10/push-wenti/nat.png">
+<meta property="og:image" content="https://tech-insq.github.io/2019/03/10/push-wenti/%E7%BD%91%E7%BB%9C%E4%BF%9D%E6%B4%BB.png">
+<meta property="article:published_time" content="2019-03-10T01:53:56.000Z">
+<meta property="article:modified_time" content="2021-11-30T14:12:51.248Z">
+<meta property="article:author" content="Zhixin.Chen">
+<meta property="article:tag" content="工程">
+<meta property="article:tag" content="技术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tech-insq.github.io/2019/03/10/push-wenti/%E5%8F%91%E9%80%81%E9%93%BE%E8%B7%AF.png">
+
+
+<link rel="canonical" href="https://tech-insq.github.io/2019/03/10/push-wenti/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tech-insq.github.io/2019/03/10/push-wenti/","path":"2019/03/10/push-wenti/","title":"PUSH 问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PUSH 问题 | 道心</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">道心</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">知止.至善.致良知｜技术洞察</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">43</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">22</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">36</span></a></li>
+        <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#push-%E9%93%BE%E8%B7%AF%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text"> PUSH 链路分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E9%93%BE%E8%B7%AF"><span class="nav-number">1.1.</span> <span class="nav-text"> 系统链路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E5%8C%96%E6%A0%B9%E5%9B%A0"><span class="nav-number">1.2.</span> <span class="nav-text"> 转化根因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E5%8F%A3%E5%BE%84"><span class="nav-number">1.3.</span> <span class="nav-text"> 统计口径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%93%BE%E8%B7%AF%E7%9A%84%E5%85%B3%E9%94%AE%E7%82%B9"><span class="nav-number">1.4.</span> <span class="nav-text"> 链路的关键点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text"> 解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%90%BD%E5%9C%B0%E7%9A%84%E6%96%B9%E6%A1%88"><span class="nav-number">2.1.</span> <span class="nav-text"> 可落地的方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E6%B4%BB%E9%95%BF%E8%BF%9E%E6%8E%A5-2"><span class="nav-number">2.2.</span> <span class="nav-text"> 保活长连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%A1%A1%E9%87%8F%E8%87%AA%E5%B7%B1%E7%9A%84push%E5%B7%B2%E7%BB%8F%E8%BE%BE%E5%88%B0%E6%9E%81%E9%99%90"><span class="nav-number">2.3.</span> <span class="nav-text"> 如何衡量自己的PUSH已经达到极限</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Zhixin.Chen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZhiYu2018" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZhiYu2018" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:ice_mind@yeah.net" title="E-Mail → mailto:ice_mind@yeah.net" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2019/03/10/push-wenti/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PUSH 问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-10 09:53:56" itemprop="dateCreated datePublished" datetime="2019-03-10T09:53:56+08:00">2019-03-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-11-30 22:12:51" itemprop="dateModified" datetime="2021-11-30T22:12:51+08:00">2021-11-30</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="push-链路分析"><a class="markdownIt-Anchor" href="#push-链路分析"></a> PUSH 链路分析</h2>
+<h3 id="系统链路"><a class="markdownIt-Anchor" href="#系统链路"></a> 系统链路</h3>
+<p>先从PUSH 相关的链路分析， 一条消息传递到客户端，需要经过的链路：</p>
+<span id="more"></span>
+<p><img src="/2019/03/10/push-wenti/%E5%8F%91%E9%80%81%E9%93%BE%E8%B7%AF.png" alt></p>
+<h3 id="转化根因"><a class="markdownIt-Anchor" href="#转化根因"></a> 转化根因</h3>
+<p><img src="/2019/03/10/push-wenti/Push%E8%BD%AC%E5%8C%96%E7%8E%87%E6%A0%B9%E5%9B%A0.png" alt></p>
+<h3 id="统计口径"><a class="markdownIt-Anchor" href="#统计口径"></a> 统计口径</h3>
+<p><img src="/2019/03/10/push-wenti/Push%E7%BB%9F%E8%AE%A1%E5%8F%A3%E5%BE%84.png" alt></p>
+<h3 id="链路的关键点"><a class="markdownIt-Anchor" href="#链路的关键点"></a> 链路的关键点</h3>
+<table>
+<thead>
+<tr>
+<th>关键点</th>
+<th>统计数据</th>
+<th>策略</th>
+<th>可落地</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>发送失败</td>
+<td>1、连接异常(数据可获取)<br>2、FCM/Apns 流控(异常)（数据可获取性跟调用方法有关）</td>
+<td>针对1的解决方法<br>1：调用批量的接口<br>2：扩大带宽<br>3：限流<br>4：负载均衡式发送<br>针对2的解决方法：<br>1：限流<br>2：了解相关系统的特殊(坑)</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>失效Token</td>
+<td>1、卸载App（数据可取性差）<br>2、长连接断开(App在，数据可取性差)</td>
+<td>针对2的解决方法<br>1：保活长连接</td>
+<td>M（待验证）</td>
+</tr>
+<tr>
+<td>FCM（Apns）到App链路异常</td>
+<td>App 的网络质量差(数据可取性差)</td>
+<td>N/A<br>取决于FCM/Apns的重试机制以及在重试的时候token 是否还有效</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p>注：</p>
+<p>如果我们要完整地了解为何到达率低，那么要获取完整的数据，存在一定的工作量问题。</p>
+<p>对于业界的到达率，感觉没有一个准数，从相关的资料了解到，有人说：</p>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>真实到达率</th>
+<th>乘上牛逼系数(1.5~N)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安卓</td>
+<td>&lt;=50%</td>
+<td>&gt;= 80%</td>
+</tr>
+<tr>
+<td>IOS</td>
+<td>&lt;=70%</td>
+<td>&gt;= 90%</td>
+</tr>
+</tbody>
+</table>
+<p>以上数据的真伪，由于没有相关的实践数据，也就无法根据自己的时间数据进行证伪，但是通过整个链路的分析，可以系统地认识到影响到达率的因素、以及可以实施的方案和待验证的方案。</p>
+<h2 id="解决方案"><a class="markdownIt-Anchor" href="#解决方案"></a> 解决方案</h2>
+<h3 id="可落地的方案"><a class="markdownIt-Anchor" href="#可落地的方案"></a> 可落地的方案</h3>
+<h4 id="限流"><a class="markdownIt-Anchor" href="#限流"></a> 限流</h4>
+<p>通过对发送机制的优化，采用限流的策略进行发送。</p>
+<h4 id="尽量批量的接口"><a class="markdownIt-Anchor" href="#尽量批量的接口"></a> 尽量批量的接口</h4>
+<p>FCM： 提供基于Topic 的接口，动态将广播推送的token 订阅到某一个topic，然后基于topic 方式进行发送，解决推送服务到FCM服务端链路异常(带宽问题、socket 超时、被FCM流控)。</p>
+<p>Apns：目前采用第三方的库没有FCM基于topic 发送的功能，可行的方案：可以用FCM来发送IOS推送，或者<strong>了解Apns topic 功能</strong>。</p>
+<p>国内推送：阿里推送、腾讯信鸽都有该功能。</p>
+<h4 id="扩大带宽"><a class="markdownIt-Anchor" href="#扩大带宽"></a> 扩大带宽</h4>
+<p>扩大机房的出口带宽</p>
+<h4 id="负载均衡式发送"><a class="markdownIt-Anchor" href="#负载均衡式发送"></a> 负载均衡式发送</h4>
+<p>该方案 只解决单节点 网卡流量问题。</p>
+<h4 id="保活长连接"><a class="markdownIt-Anchor" href="#保活长连接"></a> 保活长连接</h4>
+<p>方案见下文 &lt;&lt; 保活长连接 &gt;&gt;，通过保活长连接，确保PUSH通道不会因为Nat 超时被断开，通过定时保活长连接，确保IP 可用。</p>
+<h4 id="抱团取暖策略"><a class="markdownIt-Anchor" href="#抱团取暖策略"></a> 抱团取暖策略</h4>
+<p>​        通过对腾讯信鸽推送介绍文章了解，腾讯信鸽依赖其高频的应用（比如王者荣耀、其他游戏、微信、QQ），来拉活其他的App。其他App推送的时候能及时收到消息。</p>
+<p>​       通过共享保活Service 这样的机制，除了减少手机的连接、能耗、电量的损失，还可以提高到达率。比如如果用户安装了王者荣耀，另外安装了一些使用信鸽的App。如果其他App没有启动，也没有关系。因为王者荣耀相对来说，它的启动时间更长，这样可以通过王者荣耀先接受这些App的信息，然后推送给另外的App。</p>
+<p>​       同时，也集成厂商的一个推送通道，比如华为、魅族、小米、谷歌的TCM、FCM，这些厂商具有一些所谓的系统级别的保活、拉活的机制。</p>
+<blockquote>
+<p>启发： 针对这一点，对于出海的运用，看否可以依靠当地的大腿，比如Facebook、Youtu 来取暖。</p>
+</blockquote>
+<h3 id="保活长连接-2"><a class="markdownIt-Anchor" href="#保活长连接-2"></a> 保活长连接</h3>
+<h4 id="原因一-被系统干掉"><a class="markdownIt-Anchor" href="#原因一-被系统干掉"></a> 原因一： 被系统干掉</h4>
+<p>现在越来越多的手机厂商为了省电策略考虑，基本上如果一个应用没有被加入白名单，一旦处于后台就会被系统限制甚至干掉。这也是那些<strong>低频的应用</strong> PUSH到达率低的原因之一。</p>
+<h4 id="原因二-nat-超时机制"><a class="markdownIt-Anchor" href="#原因二-nat-超时机制"></a> 原因二:   Nat 超时机制</h4>
+<p>长连接断连主要是因为NAT断连，因为 IP v4 的 IP 量有限，运营商分配给手机终端的 IP 是运营商内网的 IP，<br>
+手机要连接 Internet，就需要通过运营商的网关做一个网络地址转换(Network Address Translation，NAT)。<br>
+简单的说运营商的网关需要维护一个外网 IP、端口到内网 IP、端口的对应关系，以确保内网的手机可以跟 Internet 的服务器通讯。大部分移动无线网络运营商都在链路一段时间没有数据通讯时，会淘汰 NAT 表中的对应项，造成链路中断。下表列出一些已测试过的网络的NAT超时时间(更多数据由于测试条件所限没有测到)：</p>
+<table>
+<thead>
+<tr>
+<th>地区\网络</th>
+<th>NAT断连时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中国移动3G 和2G</td>
+<td>5分钟</td>
+</tr>
+<tr>
+<td>中国联通2G</td>
+<td>5分钟</td>
+</tr>
+<tr>
+<td>中国电信3G</td>
+<td>&gt;=28 分钟</td>
+</tr>
+<tr>
+<td>美国3G</td>
+<td>&gt;=28 分钟</td>
+</tr>
+<tr>
+<td>台湾3G</td>
+<td>&gt;=28 分钟</td>
+</tr>
+</tbody>
+</table>
+<p>注：该数据未经实践证明（只是看了大部分的数据）。</p>
+<p>Nat 超时机制：</p>
+<p><img src="/2019/03/10/push-wenti/nat.png" alt></p>
+<h4 id="原因三-安卓dhcp的租期lease-time问题"><a class="markdownIt-Anchor" href="#原因三-安卓dhcp的租期lease-time问题"></a> 原因三： 安卓DHCP的租期（lease time）问题</h4>
+<p>安卓系统对DHCP的处理有个BUG:</p>
+<ul>
+<li>DHCP租期到了不会主动续约并且继续使用过期IP。这个问题导致的问题表象是，在超过租期的某个时间点（没有规律）会导致IP过期，老的TCP连接不会正常收发数据。并且系统没有网络变化事件，只有等应用判断主动建立新的TCP连接才引起安卓设备重新向DHCP Server 申请IP租用。</li>
+<li>未到租期的一半时间，安卓设备会重新向DHCP Server 申请IP租用。</li>
+</ul>
+<h4 id="原理"><a class="markdownIt-Anchor" href="#原理"></a> 原理</h4>
+<h5 id="line-策略"><a class="markdownIt-Anchor" href="#line-策略"></a> Line 策略</h5>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>策略</th>
+<th>细节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>美国</td>
+<td>FCM(GCM)</td>
+<td>1: 启动时，保持7分钟心跳，维持长连接半小时，之后断开长连接。<br>2: 有消息时，服务器会发送FCM消息，客户端接收FCM小时之后，重新建立长连接，并再次心跳维持半个小时。</td>
+</tr>
+<tr>
+<td>中国</td>
+<td>长连接+心跳策略</td>
+<td>心跳间隔 在WIFI 下是 3分20秒，在手机网络下是7分钟。</td>
+</tr>
+<tr>
+<td>中国</td>
+<td>轮询策略</td>
+<td>1: 客户端在长连接建立之后，也会定时发送消息，Server 会回复并且同时关闭长连接。<br>2: 客户端等待轮询时间$$T_1$$ 后再次建立TCP连接。Line 会根据手机的活跃状态动态调整$$T_1$$ , 范围是从最小1分钟～2小时半。而长连接存活时间比较固定$$T_2 $$ 比较固定，如果在$$T_2 $$ 收到新小时会延长$$T_2 $$ 时间。</td>
+</tr>
+</tbody>
+</table>
+<h5 id="whatsapp"><a class="markdownIt-Anchor" href="#whatsapp"></a> WhatsApp</h5>
+<table>
+<thead>
+<tr>
+<th>FCM可用性</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>支持FCM的设备</td>
+<td>靠FCM来激活WhatsApp, WhatsApp启动后，会建立一个与服务器的长连接，直接通过此长连接发送PUSH信息，这个长连接10分钟需消息就会主动断掉，且这10分钟内不做心跳，断掉后Whatsapp客户端和它的服务器不再连接。当有消息时候，服务器发现没有长连接会发送FCM消息，手机收到FCM小时后，会重新建立连接来收取消息，10分钟无消息会再断开，如此循环。</td>
+</tr>
+<tr>
+<td>不支持FCM的设备</td>
+<td>长连接+心跳</td>
+</tr>
+</tbody>
+</table>
+<h5 id="微信"><a class="markdownIt-Anchor" href="#微信"></a> 微信</h5>
+<table>
+<thead>
+<tr>
+<th>公共PUSH通道（信鸽）</th>
+<th>使用FCM Push 作为辅助通道</th>
+<th>自适应心跳</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h5 id="心跳典型值"><a class="markdownIt-Anchor" href="#心跳典型值"></a> 心跳典型值</h5>
+<table>
+<thead>
+<tr>
+<th>网络模式</th>
+<th>FCM</th>
+<th>Line</th>
+<th>WhatsApp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WI-FI</td>
+<td>15分钟</td>
+<td>3分20秒</td>
+<td>4分45秒</td>
+</tr>
+<tr>
+<td>手机网络</td>
+<td>28分钟</td>
+<td>7分钟</td>
+<td>4分45秒</td>
+</tr>
+</tbody>
+</table>
+<p><strong>当前值的测试，跟所属的环境有关，可能值不一样.</strong></p>
+<h5 id="可行的方案"><a class="markdownIt-Anchor" href="#可行的方案"></a> 可行的方案</h5>
+<p><img src="/2019/03/10/push-wenti/%E7%BD%91%E7%BB%9C%E4%BF%9D%E6%B4%BB.png" alt></p>
+<p>方案描述</p>
+<table>
+<thead>
+<tr>
+<th>连接</th>
+<th>周期</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>长连接</td>
+<td>1:  固定周期 $$T_1$$ <br>2:  动态调整的时间间隔</td>
+<td>1: 确保IP是有效，从而重新连接FCM/Apns，确保推送链路是通的。<br>2: 基于TCP 唤醒 App 保活。</td>
+</tr>
+<tr>
+<td>FCM/Apns</td>
+<td>1: 固定周期，$$T_2$$ <br>2: $$T_2$$ &gt; $$3T_1$$</td>
+<td>1: 采用相应的系统默认推送通道，起到系统拉活的效用。<br>2: 该消息要进行特殊处理，用户不可见</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FCM 拉活机制</strong></p>
+<blockquote>
+<p>1: 基于Topic的方式，将设备的token 订阅到某个topic，比如notify。</p>
+<p>2: 订阅topic，可以在客户端App，也可以在服务端。</p>
+<p>3: 定时对这个topic 发送用户不可见的PUSH。</p>
+</blockquote>
+<p><strong>注</strong></p>
+<blockquote>
+<p>可以适当使用高优先级的消息，允许FCM服务在必要时唤醒休眠设备并运行一些有限的处理（包括非常有限的网络访问）。高优先级消息通常应该会使得用户与您的应用或者通知进行互动。但这个要小心处理。</p>
+<p><a target="_blank" rel="noopener" href="https://firebase.google.cn/docs/cloud-messaging/concept-options?hl=zh-cn#setting-the-priority-of-a-message">消息类型</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.android.google.cn/training/monitoring-device-state/doze-standby.html?hl=zh-cn">对低电耗模式和应用待机模式进行针对性优化</a></p>
+</blockquote>
+<p><strong>Apns</strong></p>
+<blockquote>
+<p>1: 由于目前采用的开源库，不支持服务端动态将token 订阅到topic。</p>
+<p>2: 需要在客户端订阅topic。</p>
+<p>3: 需要研究如何使用基于topic的方式发送。</p>
+<p>4: 替换成FCM(待验证)</p>
+</blockquote>
+<p><strong>不同平台的消息</strong></p>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>FCM 通知消息（Anps 通知）</th>
+<th>FCM 数据消息（Anps 消息）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安卓</td>
+<td>FCM代表客户端应用自动向最终用户设备显示消息</td>
+<td>客户端应用负责处理，可以处理成用户不可见。</td>
+</tr>
+<tr>
+<td>iOS</td>
+<td>Apns 代表客户端自动向最终用户设备显示消息</td>
+<td>以透传的方式传递给客户端，无显示，需要客户端应用处理，用户才可见。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>TCP 唤醒安卓</strong></p>
+<table>
+<thead>
+<tr>
+<th>处理器</th>
+<th>功耗</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AP(Application Processor)</td>
+<td>1: 非休眠 &gt;50mA<br>2: LCD 功耗 100mA<br>3: WIFI 100mA</td>
+<td>AP是ARM架构的处理器：<br>1: 运行App的代码<br>2: 图形运算<br>3:运行Android 系统</td>
+</tr>
+<tr>
+<td>BP(Baseband Processor)</td>
+<td>1:5 mA(非通话时间)</td>
+<td>BP 用于运行实时操作系统（RTOS ）<br>1: 通讯协议栈运行在RTOS</td>
+</tr>
+</tbody>
+</table>
+<p>通讯协议栈运行与BP，在不通话的情况下，能耗低，一旦收到数据包，BP会将AP唤醒，唤醒的时间足够AP执行代码完成对收到的数据包进行处理。</p>
+<p>AlarmManager 是Android 系统封装的用于管理 RTC 的模块，RTC (Real Time Clock) 是一个独立的硬件时钟，可以在 CPU 休眠时正常运行，在预设的时间到达时，通过中断唤醒 CPU。</p>
+<h3 id="如何衡量自己的push已经达到极限"><a class="markdownIt-Anchor" href="#如何衡量自己的push已经达到极限"></a> 如何衡量自己的PUSH已经达到极限</h3>
+<p>根据不同的应用类型（高频、中频、低频）以及实践深度，自己却是很难评估自己的到达率已经达到了极限。</p>
+<p>由于自己的实践深度，自己采用浑身解数，到达率也就那么点，然后跟其他相关的同事汇报，我们已经尽力了，到达率确实也就那么点，同事可能会怼你：<strong>XX 公司的到达率 都不止这个数呢</strong></p>
+<p>所以为了让大家一个比较信服的数据，只能采用A/B 测试，比如在自己的App中即成业界技术实践深度比较深的公司，比如阿里、腾讯。</p>
+<p>当然，在做对比测试，自己得把一些错误解决掉（可用性问题）</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2019/02/10/alibbdztxqt/" rel="bookmark">阿里巴巴“大中台、小前台”读后感</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2021/05/02/jsgh/" rel="bookmark">关于技术运营的思考</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zhixin.Chen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://tech-insq.github.io/2019/03/10/push-wenti/" title="PUSH 问题">https://tech-insq.github.io/2019/03/10/push-wenti/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E7%A8%8B/" rel="tag"><i class="fa fa-tag"></i> 工程</a>
+              <a href="/tags/%E6%8A%80%E6%9C%AF/" rel="tag"><i class="fa fa-tag"></i> 技术</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/03/08/skll/" rel="prev" title="思考的力量">
+                  <i class="fa fa-chevron-left"></i> 思考的力量
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/03/23/psxtsj/" rel="next" title="推送系统设计">
+                  推送系统设计 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhixin.Chen@</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">80k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js","integrity":"sha256-blHXaX2RMvNwEOnrYOl/6/RKqNi97Ig3o6Ae3bhXPvM="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
