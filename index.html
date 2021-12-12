@@ -234,7 +234,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-12-13 01:05:41" itemprop="dateModified" datetime="2021-12-13T01:05:41+08:00">2021-12-13</time>
+        <time title="修改时间：2021-12-13 01:15:46" itemprop="dateModified" datetime="2021-12-13T01:15:46+08:00">2021-12-13</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -273,167 +273,14 @@
     <div class="post-body" itemprop="articleBody">
           <h2 id="方案"><a class="markdownIt-Anchor" href="#方案"></a> 方案</h2>
 <p>在<a target="_blank" rel="noopener" href="https://askdao.top/2021/12/%E7%BD%91%E5%85%B3%E5%B1%82%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93">网关层流量控制方案总结</a>提到了网关层的限流控制方案（<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/SQB3XeRlOnLBo71lhPGq4Q">微信公众号</a>），提到自适应的限流方案：</p>
-<p><strong><u>限流算法</u></strong></p>
-<table>
-<thead>
-<tr>
-<th>算法</th>
-<th>方案要点</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>AMID</td>
-<td>1、timeOut 时间评估 和 回退速率backoffRatio。<br>2、如果timeOut 评估准确，maxConcurrencyLimit 关系不是很大。<br>3、代码默认是500ms。<br></td>
-</tr>
-<tr>
-<td>Vegas</td>
-<td>1、alpha 参数和beta 参数，好像关系不是很大，默认值是3和6。</td>
-</tr>
-<tr>
-<td>Gradient</td>
-<td>1、rrtTolerance 和回退速率backoffRatio。</td>
-</tr>
-<tr>
-<td>Gradient2</td>
-<td>1、rrtTolerance</td>
-</tr>
-<tr>
-<td>VAMID</td>
-<td>1、借鉴BBR思路，在AMID的基础型进行修改，不设置timeOUT。<br>2、基于计数型值班统计（统计平均速度和丢失百分比，达到计数窗口rest一遍）。<br>3、处理逻辑：VAMID(代码片段)，先进行探速，探速到一定程度，根据当前的丢失百分率<br>和当前的响应时间（计数型统计平均值）和最佳响应时间（历史响应时间滑动平均值），<br>4、通过探速、对比响应时间和丢失率（没有限流拒绝掉的请求，由于超时被丢弃）进行回退。</td>
-</tr>
-<tr>
-<td>Bbr</td>
-<td>1、tcp-bbr 参考实现（未实现）</td>
-</tr>
-</tbody>
-</table>
-<p>代码参考：<a target="_blank" rel="noopener" href="https://github.com/tech-insq/thor.git%EF%BC%8C%E6%98%AF%E5%9C%A8Netflix%E7%9A%84%E4%BB%A3%E7%A0%81%E5%9F%BA%E7%A1%80%E4%B8%8A%E5%81%9A%E4%BA%86%E4%BF%AE%E6%94%B9%E3%80%82">https://github.com/tech-insq/thor.git，是在Netflix的代码基础上做了修改。</a></p>
-<p>VAMID(代码片段)：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(isBad(dropPercent, curRtt, bestRtt))&#123;</span><br><span class="line">    <span class="comment">/**太糟糕了，必须快速回退**/</span></span><br><span class="line">    <span class="keyword">int</span> oldLimit = currentLimit;</span><br><span class="line">    currentLimit = currentLimit / <span class="number">2</span>;</span><br><span class="line">    log.debug(<span class="string">&quot;isBad: drop=&#123;&#125; curRtt=&#123;&#125;, oldRtt=&#123;&#125;, rtt=&#123;&#125;,limit=&#123;&#125;-&gt;&#123;&#125;,didDrop=&#123;&#125;&quot;</span>, dropPercent,     </span><br><span class="line">              curRtt, bestRtt,rttMil, oldLimit, currentLimit, didDrop);</span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span>((dropPercent &gt;= <span class="number">0.1</span>) || isSlow(curRtt, bestRtt))&#123;</span><br><span class="line">    <span class="comment">/**有点糟糕，得回退**/</span></span><br><span class="line">    <span class="keyword">int</span> oldLimit = currentLimit;</span><br><span class="line">    currentLimit = (<span class="keyword">int</span>) (currentLimit * backoffRatio);</span><br><span class="line">    log.debug(<span class="string">&quot;isSlow: drop=&#123;&#125; curRtt=&#123;&#125;, oldRtt=&#123;&#125;, rtt=&#123;&#125;,limit=&#123;&#125;-&gt;&#123;&#125;,didDrop=&#123;&#125;&quot;</span>, dropPercent, </span><br><span class="line">              curRtt, bestRtt,rttMil, oldLimit, currentLimit, didDrop);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">     <span class="comment">/**探速**/</span></span><br><span class="line">    currentLimit =  currentLimit + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong><u>实现方案</u></strong></p>
-<p>在<a target="_blank" rel="noopener" href="https://askdao.top/2021/12/%E7%BD%91%E5%85%B3%E5%B1%82%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93">网关层流量控制方案总结</a>提到了网关层的限流控制方案（<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/SQB3XeRlOnLBo71lhPGq4Q">微信公众号</a>）提到了一个解决方案：</p>
-<img src="/2021/12/12/zsyxl/nginx.png" alt="nginx" style="zoom:67%;">
-<p>通过代码实现，修正下方案：</p>
-<ol>
-<li>
-<p>自适应限流指标计算，相对来说比较简单，比如滑动平均值、百分位、平均值、时间窗口，不需要太复杂的实时计算方案。</p>
-</li>
-<li>
-<p>在（1）的基础上采用Agent 方案，Agent 计算完更新到共享内存，Nginx 通过LUA访问共享内存（或者通过LUA UDP访问Agent）。</p>
-</li>
-<li>
-<p>不需要做全局的并发限制，每台Nginx 实例 做好自己的限流就就可以了（负载均衡、再次Nginx 基于事件驱动）、简单有效。</p>
-</li>
-</ol>
-<h2 id="可测试"><a class="markdownIt-Anchor" href="#可测试"></a> 可测试</h2>
-<img src="/2021/12/12/zsyxl/zsyxlt.png" alt="zsyxlt" style="zoom: 77%;">
-<p><strong>方案</strong></p>
-<ol>
-<li>
-<p>由于Nginx 是基于事件驱动，它将请求转发到后台服务，类似将请求push 到队列，不必堵塞到请求执行完成。</p>
-</li>
-<li>
-<p>后台服务处理完之后响应到Nginx，类似ups-thread 执行之后回调。</p>
-</li>
-<li>
-<p>线程池采用固定的线程池。</p>
-</li>
-</ol>
-<p><strong>难点</strong></p>
-<ol>
-<li>如何真实Main-thread 如何真实模拟现实的请求情况，一种基于泊松过程的思路（采用随机数）、一种不间断下请求（每达到一定数（200），睡眠5毫秒，这时1秒的理论tps 40000）。</li>
-<li>处理耗时模拟：模拟由于真实的请求多导致变慢，应该是一个基于（concurrency，queueLen）的惩罚函数，最低耗时10毫秒，采用sleep的方式来模拟。</li>
-</ol>
-<p><strong>测试结果</strong></p>
-<p><strong>理想结果</strong></p>
-<table>
-<thead>
-<tr>
-<th>线程池</th>
-<th>理想耗时</th>
-<th>Tps</th>
-<th>测试方式</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>100</td>
-<td>10ms</td>
-<td>1000/10 * 100 = 10000</td>
-<td>不间断下请求</td>
-</tr>
-</tbody>
-</table>
-<p><strong>测试结果</strong></p>
-<table>
-<thead>
-<tr>
-<th>算法</th>
-<th>TPS</th>
-<th>AVG(RTT)<br>平均响应耗时</th>
-<th>AGV(doTime)<br>处理耗时</th>
-<th>通过率</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>AMID</td>
-<td>7268</td>
-<td>24</td>
-<td>12</td>
-<td>0.351</td>
-</tr>
-<tr>
-<td>Vegas</td>
-<td>7652</td>
-<td>18</td>
-<td>12</td>
-<td>0.359</td>
-</tr>
-<tr>
-<td>Gradient</td>
-<td>7471</td>
-<td>13</td>
-<td>12</td>
-<td>0.353</td>
-</tr>
-<tr>
-<td>Gradient2</td>
-<td>7153</td>
-<td>15</td>
-<td>12</td>
-<td>0.348</td>
-</tr>
-<tr>
-<td>VAMID</td>
-<td>6430</td>
-<td>198</td>
-<td>12</td>
-<td>0.331</td>
-</tr>
-<tr>
-<td>Fix(固定限流)</td>
-<td>7600</td>
-<td>17</td>
-<td>12</td>
-<td>0.358</td>
-</tr>
-</tbody>
-</table>
-<p><strong>指标解释</strong></p>
-<ol>
-<li>RTT = 在队列中的时间 + 处理时间。</li>
-<li>doTime = 处理时间。</li>
-</ol>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<ol>
-<li>Vegas 算法相对比较优（可能是测试模型有关），VAMID最差（待改造）。</li>
-<li>队列长度对耗时的影响也很大，处理中的请求数=n * 线程池，那么队列中的剩余请求其耗时要增加(n -1) * doTime，所以并发控制阈值接近真实的并发数最佳（如果不考虑并发多导致变慢），从这个角度来看，测试值70%的利用率说明是有效的。</li>
-<li>除了VAMID，平均RTT相对于理想耗时增加的倍数接～1，说明处理中的请求数～1.5倍的线程池（Fix固定限流，就是采用150的并发限制）。</li>
-<li>测试是否可以慢点，来增加通过率，从目前的测试来看，好像不行（VAMID就是要通过慢点）。</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/12/12/zsyxl/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
