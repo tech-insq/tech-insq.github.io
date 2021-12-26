@@ -85,9 +85,9 @@
   <ul class="main-menu menu">
         <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
         <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
-        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">51</span></a></li>
-        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">24</span></a></li>
-        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">39</span></a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">54</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">25</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">40</span></a></li>
         <li class="menu-item menu-item-schedule"><a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a></li>
         <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
         <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
@@ -133,18 +133,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-count">40</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-count">54</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -203,6 +203,293 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/12/25/ncjs20211225/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Zhixin.Chen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="道心">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/12/25/ncjs20211225/" class="post-title-link" itemprop="url">业务内存计算系统设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-25 22:00:09" itemprop="dateCreated datePublished" datetime="2021-12-25T22:00:09+08:00">2021-12-25</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-12-26 21:55:21" itemprop="dateModified" datetime="2021-12-26T21:55:21+08:00">2021-12-26</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84-NEW/" itemprop="url" rel="index"><span itemprop="name">架构.NEW</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="业务背景"><a class="markdownIt-Anchor" href="#业务背景"></a> 业务背景</h2>
+<p>最近遇到这样的业务场景，公司从事的是数字货币交易所业务，其业务：</p>
+<ol>
+<li>杠杆交易</li>
+<li>算法交易</li>
+<li>现货交易</li>
+<li>兑换（部分数字货币兑换）</li>
+<li>理财</li>
+<li>质押借贷</li>
+</ol>
+<p>其中杠杆交易、质押借贷，要实时根据货币的价格变动，实时计算用户的保证金、浮动盈亏、资产、借贷质押率，从而进行：</p>
+<ol>
+<li>取消订单</li>
+<li>平仓</li>
+<li>负资产平负</li>
+<li>借贷质押清算</li>
+</ol>
+<p>同时页面周期刷新用户投资，杠杆交易的：</p>
+<ol>
+<li>风险率</li>
+<li>可用保证金</li>
+<li>浮动盈亏</li>
+<li>可用资产</li>
+</ol>
+<p>这些操作是高频操作，从这些业务的特点，需要解决：</p>
+<ol>
+<li>实时发现持仓用户的风险（浮动盈亏、可用保证金、是否爆仓）。</li>
+<li>实时发现用户的负资产。</li>
+<li>实时发现用户借贷质押率。</li>
+<li>支持高频的查询。</li>
+</ol>
+<h2 id="如何解决"><a class="markdownIt-Anchor" href="#如何解决"></a> 如何解决</h2>
+<p>首先要实时计算用户的风险，主要如下因素的变化：</p>
+<ol>
+<li>币的价格变化（币的价格5秒刷新一次）。</li>
+<li>用户交易行为，用户的交易行为包含：理财、借贷、杠杆、现货交易、兑换、算法交易、提现。</li>
+</ol>
+<h3 id="事件驱动模型"><a class="markdownIt-Anchor" href="#事件驱动模型"></a> 事件驱动模型</h3>
+<img src="/2021/12/25/ncjs20211225/trade-event-d.png" alt="trade-event-d" style="zoom:67%;">
+<p>采用事件驱动模式：</p>
+<ol>
+<li>
+<p>倒排索引：通过投资关系，将数字货币和用户uid 进行倒排索引。</p>
+</li>
+<li>
+<p>价格变化：是批量的价格更新，通过对比新旧价格，找到有价格变化的数字货币，在根据数字货币找到可能有风险的用户，</p>
+<p>进行风险计算。</p>
+</li>
+<li>
+<p>用户交易行为：杠杆（建仓、平仓、交割）、理财（投资、赎回）、借贷、资金操作（充值、提现）、交易（现货交易、兑换），</p>
+<p>这些操作会影响用户的：仓位、盈亏、总保证金、可用保证金，需要进行风险计算。</p>
+</li>
+<li>
+<p>风险计算内存队列化：用户维度的事件由于价格变化、用户交易行为是并发的，但不能每个事件过来都独立计算，这样会重复计算，这样会出现问题，因为目前计算用户风险的逻辑F=f(资产、杠杆、理财、借贷、交易)的综合逻辑，每次计算都会根据当前用户的资产情况和币的价格进行风险计算，所以如果用户uid 在队列之内，则不入队。</p>
+</li>
+</ol>
+<h3 id="循环型loop"><a class="markdownIt-Anchor" href="#循环型loop"></a> 循环型Loop</h3>
+<p><img src="/2021/12/25/ncjs20211225/trade-loop.png" alt="trade-loop"></p>
+<p>Loop 型简化了内存存储模式，用简单的map存储。每间隔（1s）对每个持仓用户（借贷）进行循环检测。</p>
+<h3 id="查询服务"><a class="markdownIt-Anchor" href="#查询服务"></a> 查询服务</h3>
+<p>​     前端（App、Web）会高频地查询用户风险信息（可用保证金、浮动盈亏、风险率、杠杆率）和可提现等信息，这些信息目前也通过该服务提供，直接从JVM 缓存获取返回，是否可以从中心化Redis查询返回？</p>
+<h3 id="方案问题issue"><a class="markdownIt-Anchor" href="#方案问题issue"></a> 方案问题（ISSUE）</h3>
+<ol>
+<li>
+<p>高可用，目前是单事例。</p>
+<p>目前是采用循环Loop型，由于担心多事例进行平仓、清算、余额平负会影响业务，甚至导致资损（用户、公司），所以才有单实例。</p>
+</li>
+<li>
+<p>性能，目前是单事例处理所有用户。</p>
+<p>目前是对所有用户进行循环检测，如果用户多，可能不能在规定的频率内完成检测。</p>
+</li>
+<li>
+<p>消息可靠性</p>
+<p>消息的可靠、准确触达。</p>
+</li>
+<li>
+<p>相关业务消息顺序问题，导致风险率不对。</p>
+<p>由于针对用户的风险，是从平台的资损角度去评估的，用户通过质押借贷、或者用户通过保证金进行杠杆操作，如果不检测用户的风险，导致用户亏空、跑路了，则是平台承担了损失。因此平台会综合 用户的持仓（头寸、浮动盈亏、保证金）、理财抵押、借贷、余额来计算用户的风险率，是综合了Trade、Loan、Eearn、Assert、Quantitative 服务用户的资产现状。但是，Trade、Loan、Eearn、Quantitative 操作会导致Assert 资产变化，如果这几个业务的消息不时同时到达，就可能影响到对用户的综合风险评估。</p>
+</li>
+<li>
+<p>批量拉取用户投资、资产信息和实时的消息，导致旧覆盖新的（启动和定时批量拉取）。</p>
+<p>5.1 由于的方案，担心消息丢失，有个兜底的定时批量更新。</p>
+<p>5.2 在进程启动的时候，会批量拉取用户的信息。</p>
+<p>这两种情况有可能出现如下的问题：</p>
+<p>5.3 旧的信息覆盖到新的信息。</p>
+<p>5.4 丢弃新的消息（启动的时候）。</p>
+</li>
+<li>
+<p>可测试。</p>
+<p>目前测试在测试的时候遇到难于测试的问题：</p>
+<p>6.1 货币的价格变化快。</p>
+<p>6.2 用户的各种交易操作。</p>
+</li>
+<li>
+<p>可观察性。</p>
+<p>7.1 主要看到进程对消息的消费是否及时，以及目前的内存数据是否个用户真实的持仓等资产情况一致。</p>
+</li>
+</ol>
+<h2 id="问题解决"><a class="markdownIt-Anchor" href="#问题解决"></a> 问题解决</h2>
+<h3 id="is1~2"><a class="markdownIt-Anchor" href="#is1~2"></a> IS.1～2:</h3>
+<p><img src="/2021/12/25/ncjs20211225/multi-m-s.png" alt="multi-m-s"></p>
+<p><strong>方案关键点</strong>：</p>
+<ol>
+<li>根据用户UID进行分片，每个分片的进程只负责各种分片内的用户风险检测。</li>
+<li>查询服务在路由层通过UID路由响应的分片服务（M、S）上。</li>
+<li>每个服务所负责的分片通过配置打包到Docker镜像中，M、S在启动之后通过Etcd进行主备竞选，只有主的分片服务才有风险通知处理。</li>
+<li>备检测到主挂后，将自己设置为主的角色（为了避免脑裂，所以采用etcd来避免这种问题的发生）。</li>
+<li>主、备同时提供查询服务，主挂掉，备接管，主备内存数据的一致性问题（要分析如果不一致会发生什么事情）。方案先通过可观察性方案，先检测是否有这种问题。</li>
+</ol>
+<p><strong>主备角色功能</strong></p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>M</th>
+<th>S</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>查询</td>
+<td>👍</td>
+<td>👍</td>
+</tr>
+<tr>
+<td>风险检测</td>
+<td>👍</td>
+<td>👍</td>
+</tr>
+<tr>
+<td>风险操作通知</td>
+<td>👍</td>
+<td>👎</td>
+</tr>
+</tbody>
+</table>
+<h3 id="is4"><a class="markdownIt-Anchor" href="#is4"></a> IS.4</h3>
+<p>从领域设计的原则来看，我们应该只引用聚合根，从上文的分析来看，因为的业务行为导致了：</p>
+<ol>
+<li>
+<p>杠杆交易，导致了仓位（领域）的变化，仓位变化导致用户资产（域）的变化。</p>
+</li>
+<li>
+<p>用户提现（入金）、兑换、理财（抵押）导致了资产（域）的变化，保证金的变化。</p>
+</li>
+<li>
+<p>价格的变化影响仓位、资产、抵押率的变化（单一影响）。</p>
+</li>
+<li>
+<p>1、2、3的变化综合影响了用户的风险率，1、2一个事务包含两个域的变化、如果先后到达、或者顺序乱掉，导致在某个时间内对用户的风险率计算出错。</p>
+</li>
+<li>
+<p>风控监听、消费的应该是一个<strong>完整业务语义</strong>的事件，这样才不会出现已知或者其他未知的问题。</p>
+<p><img src="/2021/12/25/ncjs20211225/event-aggregate.png" alt="event-aggregate"></p>
+</li>
+</ol>
+<p><strong>关键技术点</strong></p>
+<ol>
+<li>业务的触发者（Trade、Eean、Loan）在开始事务的时候，到事务协调器申请业务ID（事务），该事务ID是全局递增。</li>
+<li>触发者调用下游的时候，将txn-id 传递给下游服务，下游服务发送消息的时候先根据txn-id登记到事务协调器。</li>
+<li>触发者发送消息的时候也根据txn-id 登记到事务协调器。</li>
+<li>触发者根据最终业务处理状态，根据txn-id 事务协调器登记C事件（confirm 或 cancle）。</li>
+<li>事务协调器根据最终确认取消该txn-id 登记的消息，或者打包txn-id关联的事件，再最终发到kafka（当前的技术选型）队列中去。</li>
+<li>如果为了性能，可以根据UID分到不同的partion，Risk-Perception 服务根据各种的分片号+（M、S）的group 号订阅消息，确保每个分片服务都可以消费到消息。</li>
+<li>由于发送到kafka 是根据UID分partion，相同UID的事件是在同一个partion，确保了消息的顺序性。</li>
+<li>事务协调器起到了事件聚合的作用。</li>
+</ol>
+<h3 id="is5"><a class="markdownIt-Anchor" href="#is5"></a> IS.5</h3>
+<p>由于业务的触发者在开始业务的时候，会去申请txn-id，同时消息队列也有该txn-id，只要业务方把该txn-id 存储到业务表内。</p>
+<p>批量拉取的时候，同时将txn-id 返回给Risk-Perception。由于txn-id 是递增的，Risk-Perception 可以根据txn-id 去判断新、旧，从而解决旧可能覆盖到新的问题。</p>
+<h3 id="is6"><a class="markdownIt-Anchor" href="#is6"></a> IS.6</h3>
+<p>解决了旧覆盖新的问题，Risk-Perception 的内存状态取决对消息的消费情况，所以定义可观测的指标：</p>
+<ol>
+<li>
+<p>事务ID实时差距指标(当前事务指标txn-id - 消费txn-id)。</p>
+</li>
+<li>
+<p>消息消费延迟指标（消费消息时间-消息产生时间）。</p>
+</li>
+<li>
+<p>消息投递成功率（消息消息数/消息总投递数）【不是很重要】。</p>
+</li>
+<li>
+<p>M- S 数据的一致性指标事务ID实时差距指标，如果是一致的，其差距指标是一致的。</p>
+</li>
+<li></li>
+</ol>
+<h3 id="is3"><a class="markdownIt-Anchor" href="#is3"></a> IS.3</h3>
+<p>消息投递可靠性，由于各个业务投递给Risk-Perception的领域时间，是用户各个业务数据的快照（而不是变化值），某些事件的丢失只会影响对风险识别的实时性，所以可以容忍部分事件的丢失。</p>
+<h3 id="is7"><a class="markdownIt-Anchor" href="#is7"></a> IS.7</h3>
+<p>Risk-Perceptio 关键是验证风险识别规则是否正确实现，所以从可单元化测试的角度来看，将各个规则实现具有输入、输出的函数，这样方便单元化测试，从而保证质量。对于完整进程运行正确性的验证，则要构造事件。</p>
+
+      
+    </div>
+
+    
+    
+    
+      
+
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/12/19/twyfyn/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -228,7 +515,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2021-12-19 20:56:27 / 修改时间：21:35:59" itemprop="dateCreated datePublished" datetime="2021-12-19T20:56:27+08:00">2021-12-19</time>
+      <time title="创建时间：2021-12-19 20:56:27 / 修改时间：21:40:33" itemprop="dateCreated datePublished" datetime="2021-12-19T20:56:27+08:00">2021-12-19</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -274,7 +561,7 @@
 <p>我淋过冲刷浅滩的雨，</p>
 <p>这算不算是追寻的一种考验？</p>
 <p>我像一个迷路的小孩，</p>
-<p>迷失在近处的丘陵浅谈中，</p>
+<p>迷失在近处的丘陵浅滩中，</p>
 <p>始终，找不到一条走向远方的路，</p>
 <p>偶然间，放松了追寻的心，</p>
 <p>掉头去看近处的风花雪月。</p>
@@ -1217,110 +1504,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tech-insq.github.io/2021/09/01/cxyznqy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Zhixin.Chen">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="道心">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/09/01/cxyznqy/" class="post-title-link" itemprop="url">前言</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-09-01 05:00:49" itemprop="dateCreated datePublished" datetime="2021-09-01T05:00:49+08:00">2021-09-01</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-11-30 21:49:39" itemprop="dateModified" datetime="2021-11-30T21:49:39+08:00">2021-11-30</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%A8%8B%E5%BA%8F%E5%91%98%E4%BF%AE%E7%82%BC%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">程序员修炼之路</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.3k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>​         类似&lt;&lt;xxx修炼xxxx&gt;&gt;之路的书，目前市面上有很多，比如&lt;&lt;架构师修炼之道&gt;&gt;、&lt;&lt;技术人修炼之道&gt;&gt;、&lt;&lt;程序员修炼之道&gt;&gt;、&lt;&lt;程序员修炼之道：从小工到专家&gt;&gt;、&lt;&lt;程序员修炼之道：通向务实的最高境界&gt;&gt;等等。既然市面上已经有类似的书，那么为什么还要写这本类似的书呢？首先本书与这些书籍的侧重点不一样。这些书籍的特点都是偏向方法论、工具、原则的介绍。在一些涉及到技术细节、技术原理、架构相关的，则介绍得比较少，或者介绍得比较不够深入。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/09/01/cxyznqy/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
@@ -1347,13 +1530,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">87k</span>
+    <span title="站点总字数">90k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:19</span>
+    <span title="站点阅读时长">1:22</span>
   </span>
 </div>
 
