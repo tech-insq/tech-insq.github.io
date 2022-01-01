@@ -22,12 +22,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"tech-insq.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="多活的关键指标    指标 意义 影响     RTO Recovery Time Objective，即恢复时间目标。 业务中断时长   RPO Recovery Point Objective，数据恢复点目标。 业务系统所能容忍的数据丢失量。     MSHA 围绕国际通用的容灾系统的评审标准 Share 78 来进行功能设计，达到 6 级容灾，保证在灾难发生时业务不发生中断。  根据国家标">
+<meta name="description" content="多活的关键指标    指标 意义 影响     RTO Recovery Time Objective，即恢复时间目标。 业务中断时长   RPO Recovery Point Objective，数据恢复点目标。 业务系统所能容忍的数据丢失量。     MSHA 围绕国际通用的容灾系统的评审标准 Share 78 来进行功能设计，达到 6 级容灾，保证在灾难发生时业务不发生中断。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="同城双活异地保活">
 <meta property="og:url" content="https://tech-insq.github.io/2021/12/31/azha20211231/index.html">
 <meta property="og:site_name" content="道心">
-<meta property="og:description" content="多活的关键指标    指标 意义 影响     RTO Recovery Time Objective，即恢复时间目标。 业务中断时长   RPO Recovery Point Objective，数据恢复点目标。 业务系统所能容忍的数据丢失量。     MSHA 围绕国际通用的容灾系统的评审标准 Share 78 来进行功能设计，达到 6 级容灾，保证在灾难发生时业务不发生中断。  根据国家标">
+<meta property="og:description" content="多活的关键指标    指标 意义 影响     RTO Recovery Time Objective，即恢复时间目标。 业务中断时长   RPO Recovery Point Objective，数据恢复点目标。 业务系统所能容忍的数据丢失量。     MSHA 围绕国际通用的容灾系统的评审标准 Share 78 来进行功能设计，达到 6 级容灾，保证在灾难发生时业务不发生中断。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://tech-insq.github.io/2021/12/31/azha20211231/rto_rpo.png">
 <meta property="og:image" content="https://tech-insq.github.io/2021/12/31/azha20211231/msha_jb.png">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://tech-insq.github.io/2021/12/31/azha20211231/fblc.png">
 <meta property="og:image" content="https://tech-insq.github.io/2021/12/31/azha20211231/ysck.png">
 <meta property="article:published_time" content="2021-12-31T01:52:17.000Z">
-<meta property="article:modified_time" content="2022-01-01T01:48:10.461Z">
+<meta property="article:modified_time" content="2022-01-01T01:52:37.903Z">
 <meta property="article:author" content="Zhixin.Chen">
 <meta property="article:tag" content="高可用">
 <meta property="article:tag" content="多活">
@@ -251,7 +251,7 @@
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2022-01-01 09:48:10" itemprop="dateModified" datetime="2022-01-01T09:48:10+08:00">2022-01-01</time>
+        <time title="修改时间：2022-01-01 09:52:37" itemprop="dateModified" datetime="2022-01-01T09:52:37+08:00">2022-01-01</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -312,6 +312,7 @@
 </table>
 <p><img src="/2021/12/31/azha20211231/rto_rpo.png" alt="rto_rpo"></p>
 <p>MSHA 围绕国际通用的容灾系统的评审标准 Share 78 来进行功能设计，达到 6 级容灾，保证在灾难发生时业务不发生中断。</p>
+<span id="more"></span>
 <img src="/2021/12/31/azha20211231/msha_jb.png" alt="msha_jb" style="zoom:67%;">
 <p>根据国家标准&lt;&lt;信息安全技术-信息系统灾难恢复规范&gt;&gt;，将信息系统灾难恢复等级分为6级：</p>
 <table>
